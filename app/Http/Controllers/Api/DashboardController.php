@@ -5,43 +5,34 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use App\Services\DashboardService;
 use App\Models\User;
+use App\Services\ApiResponseService; // Import API response service
 
 class DashboardController extends Controller
 {
-    public $user;
+    protected $DashboardService;
+    protected $ApiResponseService;
 
-    public function __construct()
+    public function __construct(DashboardService $DashboardService)
     {
-        $this->middleware('auth:sanctum');
+        $this->DashboardService = $DashboardService;
     }
 
     public function index()
     {
-        // Get authenticated user
-        // Get user
-        $user = User::find(1);
+        $permission = 'dashboard.view'; 
 
+        $userPermission = $this->DashboardService->checkPermission($permission);
 
-
-        // $user = Auth::user(); // No need for guard('api'), Sanctum handles it
-        // dd($user->can('dashboard.view'));
-
-        // Check if user has permission
-        if (!$user || !$user->can('dashboard.view')) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized access to dashboard!'
-            ], 403);
+        if(isset($userPermission) && !empty($userPermission)){
+            return $userPermission;
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'users' => [],
-            ]
-        ], 200);
+        $dashboardData = $this->DashboardService->getDashboardData();
+
+        return ApiResponseService::success('Dashboard data retrieved successfully', $dashboardData);
     }
 }

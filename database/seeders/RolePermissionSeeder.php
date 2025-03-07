@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -30,6 +31,16 @@ class RolePermissionSeeder extends Seeder
                     'dashboard.edit',
                 ]
             ],
+            [
+                'group_name' => 'role',
+                'permissions' => [
+                    'role.create',
+                    'role.view',
+                    'role.edit',
+                    'role.delete',
+                    'role.approve',
+                ]
+            ],
         ];
 
          // Do same for the admin guard for tutorial purposes.
@@ -46,7 +57,7 @@ class RolePermissionSeeder extends Seeder
                          [
                              'name' => $permissions[$i]['permissions'][$j],
                              'group_name' => $permissionGroup,
-                             'guard_name' => 'api'
+                             'guard_name' => 'web'
                          ]
                      );
                      $roleSuperAdmin->givePermissionTo($permission);
@@ -65,14 +76,25 @@ class RolePermissionSeeder extends Seeder
     private function maybeCreateSuperAdminRole($admin): Role
     {
         if (is_null($admin)) {
-            $roleSuperAdmin = Role::create(['name' => 'superadmin', 'guard_name' => 'api']);
+            $roleSuperAdmin = Role::create(['name' => 'superadmin', 'guard_name' => 'web']);
         } else {
-            $roleSuperAdmin = Role::where('name', 'superadmin')->where('guard_name', 'api')->first();
+            $roleSuperAdmin = Role::where('name', 'superadmin')->where('guard_name', 'web')->first();
         }
 
         if (is_null($roleSuperAdmin)) {
-            $roleSuperAdmin = Role::create(['name' => 'superadmin', 'guard_name' => 'api']);
+            $roleSuperAdmin = Role::create(['name' => 'superadmin', 'guard_name' => 'web']);
         }
+
+         // Ensure the data is inserted into model_has_roles table manually
+        DB::table('model_has_roles')->updateOrInsert([
+            'role_id' => $roleSuperAdmin->id,
+            'model_type' => User::class,
+            'model_id' => $admin->id
+        ]);
+
+        \Log::info($admin);
+        \Log::info('permission');
+
         return $roleSuperAdmin;
     }
 }
