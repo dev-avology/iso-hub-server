@@ -7,6 +7,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -17,11 +18,12 @@ class RolePermissionSeeder extends Seeder
     {
         $permissions = [
             [
-                'group_name' => 'team_member',
+                'group_name' => 'user',
                 'permissions' => [
-                    'team_member.add',
-                    'team_member.edit',
-                    'team_member.delete',
+                    'user.add',
+                    'user.edit',
+                    'user.delete',
+                    'user.view',
                 ]
             ],
             [
@@ -44,7 +46,7 @@ class RolePermissionSeeder extends Seeder
         ];
 
          // Do same for the admin guard for tutorial purposes.
-         $admin = User::where('name', 'superadmin')->first();
+         $admin = User::where('role_id', '1')->first();
          $roleSuperAdmin = $this->maybeCreateSuperAdminRole($admin);
  
          // Create and Assign Permissions
@@ -85,15 +87,23 @@ class RolePermissionSeeder extends Seeder
             $roleSuperAdmin = Role::create(['name' => 'superadmin', 'guard_name' => 'web']);
         }
 
+        if (is_null($admin)) {
+            $admin           = new User();
+            $admin->first_name     = "superadmin";
+            $admin->last_name     = "superadmin";
+            $admin->email    = "superadmin@gmail.com";
+            $admin->phone    = "4343434343";
+            $admin->role_id = "1";
+            $admin->password = Hash::make('12345678');
+            $admin->save();
+        }
+
          // Ensure the data is inserted into model_has_roles table manually
         DB::table('model_has_roles')->updateOrInsert([
             'role_id' => $roleSuperAdmin->id,
             'model_type' => User::class,
             'model_id' => $admin->id
         ]);
-
-        \Log::info($admin);
-        \Log::info('permission');
 
         return $roleSuperAdmin;
     }
