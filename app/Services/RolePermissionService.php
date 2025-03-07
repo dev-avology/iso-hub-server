@@ -91,6 +91,7 @@ class RolePermissionService
             'permissions' => $allPermission
         ];
     }
+    
 
     public function deleteRole($role_id){
          // Find the role
