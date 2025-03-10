@@ -40,18 +40,24 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::group(['prefix' => 'user'], function () {
         Route::get('/get-user-permission/{user_id}', [UserController::class, 'getUserPermission']);
+        Route::post('/create', [UserController::class, 'createUser']);
+        Route::put('/update', [UserController::class, 'updateUser']);
+        Route::get('/destroy/{id}', [UserController::class, 'destroyUser']);
+        Route::get('/lists', [UserController::class, 'getUsers']);
     });
 
     Route::group(['prefix' => 'team-member'], function () {
         Route::post('/create', [UserController::class, 'createTeamMember']);
         Route::put('/update', [UserController::class, 'updateTeamMember']);
         Route::get('/destroy/{id}', [UserController::class, 'destroyTeamMember']);
+        Route::get('/lists', [UserController::class, 'getTeamMembersList']);
     });
 
     Route::group(['prefix' => 'vendor'], function () {
         Route::post('/create', [UserController::class, 'createVendor']);
         Route::put('/update', [UserController::class, 'updateVendor']);
         Route::get('/destroy/{id}', [UserController::class, 'destroyVendor']);
+        Route::get('/lists', [UserController::class, 'getVendorsList']);
     });
 
 

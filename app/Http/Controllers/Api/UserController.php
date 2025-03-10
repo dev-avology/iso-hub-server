@@ -54,6 +54,38 @@ class UserController extends Controller
         return ApiResponseService::success('Team member added successfully', $user);
     }
 
+    public function createUser(Request $request)
+    {
+        // Use Validator for detailed error handling
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:users,email',
+            'phone' => 'required',
+            'role_id' => 'required',
+            'password' => 'required',
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        // $permission = 'user.add';
+        // $userPermission = $this->DashboardService->checkPermission($permission);
+
+        // if (!empty($userPermission)) {
+        //     return $userPermission;
+        // }
+
+        $user = $this->UserService->addUser($request);
+
+        return ApiResponseService::success('User added successfully', $user);
+    }
+
     public function createVendor(Request $request)
     {
         // Use Validator for detailed error handling
@@ -97,6 +129,27 @@ class UserController extends Controller
         return ApiResponseService::success('Team member updated successfully', $user);
     }
 
+    public function updateUser(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:users,email,' . $request->id,
+            'phone' => 'required',
+            'role_id' => 'required',
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+        $user = $this->UserService->updateUser($request);
+        return ApiResponseService::success('User updated successfully', $user);
+    }
+
     public function updateVendor(Request $request)
     {
         // Use Validator for detailed error handling
@@ -128,6 +181,16 @@ class UserController extends Controller
         }
         $user = $this->UserService->destroyTeamMember($id);
         return ApiResponseService::success('Team member deleted successfully');
+    }
+
+    public function destroyUser($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return ApiResponseService::error('User not found', 404);
+        }
+        $user = $this->UserService->destroyUser($id);
+        return ApiResponseService::success('User deleted successfully');
     }
 
     public function destroyVendor($id)
@@ -178,6 +241,58 @@ class UserController extends Controller
             'user' => $user,
             'roles' => $roles, // List of roles
             'permissions' => $permissions, // List of permissions
+        ]);
+    }
+
+    public function getUsers(Request $request)
+    {
+        $query = User::query();
+
+        if ($request->user_id) {
+            $query->where('id', $request->user_id);
+        }
+
+        if ($request->role_id) {
+            $query->where('role_id', $request->role_id);
+        }
+
+        $users = $query->get();
+
+        return response()->json([
+            'message' => 'User lists fetched successfully',
+            'user' => $users,
+        ]);
+    }
+
+    public function getTeamMembersList(Request $request)
+    {
+        $query = TeamMember::query();
+
+        if ($request->id) {
+            $query->where('id', $request->id);
+        }
+
+        $users = $query->get();
+
+        return response()->json([
+            'message' => 'Team member lists fetched successfully',
+            'team_members' => $users,
+        ]);
+    }
+
+    public function getVendorsList(Request $request)
+    {
+        $query = Vendor::query();
+
+        if ($request->id) {
+            $query->where('id', $request->id);
+        }
+
+        $users = $query->get();
+
+        return response()->json([
+            'message' => 'Vendor lists fetched successfully',
+            'vendors' => $users,
         ]);
     }
 }
