@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\RolePermissionController;
+use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/create', [RolePermissionController::class, 'create']);
         Route::put('/update', [RolePermissionController::class, 'update']);
         Route::get('/delete/{role_id}', [RolePermissionController::class, 'destroy']);
+    });
+
+    Route::group(['prefix' => 'user'], function () {
+        // Route::get('/view', [RolePermissionController::class, 'index']);
+        Route::post('/create', [UserController::class, 'create']);
+        Route::put('/update', [UserController::class, 'update']);
+        Route::get('/destroy/{user_id}', [UserController::class, 'destroy']);
     });
 
     Route::post('/assign-role', [RolePermissionController::class, 'assignRole']);
