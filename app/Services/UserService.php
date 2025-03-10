@@ -5,6 +5,8 @@ namespace App\Services;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\TeamMember;
+use App\Models\Vendor;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
@@ -12,45 +14,67 @@ use Illuminate\Support\Str;
 
 class UserService
 {
-    public function addUser($request)
+    public function addTeamMember($request)
     {
-        // Generate a random password
-        $randomPassword = Str::random(10);
-
         // Create the user
-        $user = User::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
+        $user = TeamMember::create([
+            'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'password' => Hash::make($randomPassword), // Store hashed password
-            'role_id' => $request->role_id, // Assuming 'role' is not a hashed field
+            'address' => $request->address,
         ]);
-
-        // Optionally, send the generated password via email
-        // Mail::to($user->email)->send(new UserPasswordMail($user, $randomPassword));
         return $user;
     }
 
-    public function updateUser($request)
+    public function addVendor($request)
     {
-        $user = User::where('id', $request->user_id)->first();
-        $user->update([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
+        // Create the user
+        $user = Vendor::create([
+            'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'role_id' => $request->role_id,
+            'address' => $request->address,
         ]);
-        // Optionally, send the generated password via email
-        // Mail::to($user->email)->send(new UserPasswordMail($user, $randomPassword));
         return $user;
     }
 
-    public function destroyUser($user_id)
+    public function updateTeamMember($request)
+    {
+        $user = TeamMember::where('id', $request->id)->first();
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
+        ]);
+        return $user;
+    }
+
+    public function updateVendor($request)
+    {
+        $user = Vendor::where('id', $request->id)->first();
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
+        ]);
+        return $user;
+    }
+
+    public function destroyTeamMember($id)
     {
         // Find the user
-        $user = User::findOrFail($user_id);
+        $user = TeamMember::findOrFail($id);
+        // Delete the user
+        $user->delete();
+        return true;
+    }
+
+    public function destroyVendor($id)
+    {
+        // Find the user
+        $user = Vendor::findOrFail($id);
         // Delete the user
         $user->delete();
         return true;

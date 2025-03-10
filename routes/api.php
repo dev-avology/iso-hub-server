@@ -39,9 +39,23 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::group(['prefix' => 'user'], function () {
-        Route::post('/create', [UserController::class, 'create']);
-        Route::put('/update', [UserController::class, 'update']);
-        Route::get('/destroy/{user_id}', [UserController::class, 'destroy']);
         Route::get('/get-user-permission/{user_id}', [UserController::class, 'getUserPermission']);
     });
+
+    Route::group(['prefix' => 'team-member'], function () {
+        Route::post('/create', [UserController::class, 'createTeamMember']);
+        Route::put('/update', [UserController::class, 'updateTeamMember']);
+        Route::get('/destroy/{id}', [UserController::class, 'destroyTeamMember']);
+    });
+
+    Route::group(['prefix' => 'vendor'], function () {
+        Route::post('/create', [UserController::class, 'createVendor']);
+        Route::put('/update', [UserController::class, 'updateVendor']);
+        Route::get('/destroy/{id}', [UserController::class, 'destroyVendor']);
+    });
+
+
+    // Route::post('/create-team-member', [UserController::class, 'teamMembercreate']);
+    // Route::put('/update-team-member', [UserController::class, 'teamMemberUpdate']);
+    // Route::get('/team-member-destroy/{user_id}', [UserController::class, 'teamMemberDestroy']);
 });

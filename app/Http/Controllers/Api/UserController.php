@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\TeamMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Services\UserService;
@@ -10,6 +11,7 @@ use App\Services\DashboardService;
 use App\Services\ApiResponseService; // Import API response service
 use App\Models\User;
 use App\Models\UploadFiles;
+use App\Models\Vendor;
 
 class UserController extends Controller
 {
@@ -22,15 +24,14 @@ class UserController extends Controller
         $this->DashboardService = $DashboardService;
     }
 
-    public function create(Request $request)
+    public function createTeamMember(Request $request)
     {
         // Use Validator for detailed error handling
         $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users,email',
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:team_members,email',
             'phone' => 'required',
-            'role_id' => 'required|exists:roles,id', // Ensure role_id exists in roles table
+            'address' => 'required',
         ]);
 
         // Return validation errors if any
@@ -41,28 +42,26 @@ class UserController extends Controller
             ], 422);
         }
 
-        $permission = 'user.add';
-        $userPermission = $this->DashboardService->checkPermission($permission);
+        // $permission = 'user.add';
+        // $userPermission = $this->DashboardService->checkPermission($permission);
 
-        if (!empty($userPermission)) {
-            return $userPermission;
-        }
+        // if (!empty($userPermission)) {
+        //     return $userPermission;
+        // }
 
-        $user = $this->UserService->addUser($request);
+        $user = $this->UserService->addTeamMember($request);
 
-        return ApiResponseService::success('New user added successfully', $user);
+        return ApiResponseService::success('Team member added successfully', $user);
     }
 
-    public function update(Request $request)
+    public function createVendor(Request $request)
     {
         // Use Validator for detailed error handling
         $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users,email,' . $request->user_id, // Allow updating own email
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:vendors,email',
             'phone' => 'required',
-            'role_id' => 'required|exists:roles,id', // Ensure role_id exists in roles table
-            'user_id' => 'required|exists:users,id'
+            'address' => 'required',
         ]);
 
         // Return validation errors if any
@@ -72,33 +71,73 @@ class UserController extends Controller
                 'errors' => $validator->errors(),
             ], 422);
         }
-
-        $permission = 'user.edit';
-        $userPermission = $this->DashboardService->checkPermission($permission);
-
-        if (!empty($userPermission)) {
-            return $userPermission;
-        }
-
-        $user = $this->UserService->updateUser($request);
-
-        return ApiResponseService::success('User updated successfully', $user);
+        $user = $this->UserService->addVendor($request);
+        return ApiResponseService::success('Vendor added successfully', $user);
     }
 
-    public function destroy($user_id)
+    public function updateTeamMember(Request $request)
     {
-        $user = User::find($user_id);
+        // Use Validator for detailed error handling
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:team_members,email,' . $request->id,
+            'phone' => 'required',
+            'id' => 'required|exists:team_members,id',
+            'address' => 'required'
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+        $user = $this->UserService->updateTeamMember($request);
+        return ApiResponseService::success('Team member updated successfully', $user);
+    }
+
+    public function updateVendor(Request $request)
+    {
+        // Use Validator for detailed error handling
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:vendors,email,' . $request->id,
+            'phone' => 'required',
+            'id' => 'required|exists:vendors,id',
+            'address' => 'required'
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+        $user = $this->UserService->updateVendor($request);
+        return ApiResponseService::success('Vendor updated successfully', $user);
+    }
+
+
+    public function destroyTeamMember($id)
+    {
+        $user = TeamMember::find($id);
         if (!$user) {
-            return ApiResponseService::error('User not found', 404);
+            return ApiResponseService::error('Team member not found', 404);
         }
-        $permission = 'user.delete';
-        $userPermission = $this->DashboardService->checkPermission($permission);
+        $user = $this->UserService->destroyTeamMember($id);
+        return ApiResponseService::success('Team member deleted successfully');
+    }
 
-        if (!empty($userPermission)) {
-            return $userPermission;
+    public function destroyVendor($id)
+    {
+        $user = Vendor::find($id);
+        if (!$user) {
+            return ApiResponseService::error('Vendor not found', 404);
         }
-        $user = $this->UserService->destroyUser($user_id);
-        return ApiResponseService::success('User deleted successfully');
+        $user = $this->UserService->destroyVendor($id);
+        return ApiResponseService::success('Vendor deleted successfully');
     }
 
     public function uploadFiles(Request $request)
@@ -111,7 +150,7 @@ class UserController extends Controller
         // Store the uploaded file
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
-              $path = $request->file('files')->store('uploads', 'public'); // Store in `storage/app/public/uploads`
+                $path = $request->file('files')->store('uploads', 'public');
             }
 
             return response()->json([
@@ -122,10 +161,11 @@ class UserController extends Controller
         return response()->json(['error' => 'No file uploaded'], 400);
     }
 
-    public function getUserPermission($user_id){
+    public function getUserPermission($user_id)
+    {
         // Find user by email
         $user = User::where('id', $user_id)->first();
-        
+
         if (!$user) {
             return ApiResponseService::error('User not found', 404);
         }
