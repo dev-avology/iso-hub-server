@@ -18,31 +18,14 @@ class RolePermissionSeeder extends Seeder
     {
         $permissions = [
             [
-                'group_name' => 'user',
+                'group_name' => 'team_member',
                 'permissions' => [
-                    'user.add',
-                    'user.edit',
-                    'user.delete',
-                    'user.view',
+                    'team_member.add',
+                    'team_member.edit',
+                    'team_member.delete',
+                    'team_member.view',
                 ]
-            ],
-            [
-                'group_name' => 'dashboard',
-                'permissions' => [
-                    'dashboard.view',
-                    'dashboard.edit',
-                ]
-            ],
-            [
-                'group_name' => 'role',
-                'permissions' => [
-                    'role.create',
-                    'role.view',
-                    'role.edit',
-                    'role.delete',
-                    'role.approve',
-                ]
-            ],
+            ]
         ];
 
          // Do same for the admin guard for tutorial purposes.
