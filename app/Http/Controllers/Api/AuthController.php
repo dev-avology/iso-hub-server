@@ -79,9 +79,15 @@ class AuthController extends Controller
         // Generate authentication token
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        // Get user's roles and permissions using Spatie
+        $roles = $user->getRoleNames(); // Returns a collection of role names
+        $permissions = $user->getAllPermissions()->pluck('name'); // Get all permissions assigned
+
         return response()->json([
             'message' => 'Login successful',
             'user' => $user,
+            'roles' => $roles, // List of roles
+            'permissions' => $permissions, // List of permissions
             'token' => $token,
         ]);
     }
