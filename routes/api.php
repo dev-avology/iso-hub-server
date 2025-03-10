@@ -42,5 +42,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/create', [UserController::class, 'create']);
         Route::put('/update', [UserController::class, 'update']);
         Route::get('/destroy/{user_id}', [UserController::class, 'destroy']);
+        Route::get('/get-user-permission/{user_id}', [UserController::class, 'getUserPermission']);
     });
 });
