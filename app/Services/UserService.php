@@ -26,6 +26,21 @@ class UserService
         return $user;
     }
 
+    public function addUser($request)
+    {
+        // Create the user
+        $user = User::create([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'role_id' => $request->role_id,
+            'password' => Hash::make($request->password), // Encrypt password
+        ]);
+
+        return $user;
+    }
+
     public function addVendor($request)
     {
         // Create the user
@@ -46,6 +61,19 @@ class UserService
             'email' => $request->email,
             'phone' => $request->phone,
             'address' => $request->address,
+        ]);
+        return $user;
+    }
+
+    public function updateUser($request)
+    {
+        $user = User::where('id', $request->id)->first();
+        $user->update([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'role_id' => $request->role_id
         ]);
         return $user;
     }
@@ -75,6 +103,15 @@ class UserService
     {
         // Find the user
         $user = Vendor::findOrFail($id);
+        // Delete the user
+        $user->delete();
+        return true;
+    }
+
+    public function destroyUser($id)
+    {
+        // Find the user
+        $user = User::findOrFail($id);
         // Delete the user
         $user->delete();
         return true;
