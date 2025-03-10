@@ -42,7 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Route::get('/view', [RolePermissionController::class, 'index']);
         Route::post('/create', [UserController::class, 'create']);
         Route::put('/update', [UserController::class, 'update']);
-        // Route::get('/delete/{role_id}', [RolePermissionController::class, 'destroy']);
+        Route::get('/destroy/{user_id}', [UserController::class, 'destroy']);
     });
 
     Route::post('/assign-role', [RolePermissionController::class, 'assignRole']);

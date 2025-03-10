@@ -46,4 +46,13 @@ class UserService
         // Mail::to($user->email)->send(new UserPasswordMail($user, $randomPassword));
         return $user;
     }
+
+    public function destroyUser($user_id)
+    {
+        // Find the user
+        $user = User::findOrFail($user_id);
+        // Delete the user
+        $user->delete();
+        return true;
+    }
 }

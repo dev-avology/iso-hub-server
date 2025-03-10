@@ -83,4 +83,19 @@ class UserController extends Controller
 
         return ApiResponseService::success('User updated successfully', $user);
     }
+
+    public function destroy($user_id){
+        $user = User::find($user_id);
+        if (!$user) {
+            return ApiResponseService::error('User not found', 404);
+        }
+        $permission = 'user.delete';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+        $user = $this->UserService->destroyUser($user_id);
+        return ApiResponseService::success('User deleted successfully');
+    }
 }
