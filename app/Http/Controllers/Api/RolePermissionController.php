@@ -27,12 +27,12 @@ class RolePermissionController extends Controller
 
     public function index()
     {
-        $permission = 'role.view';
-        $userPermission = $this->DashboardService->checkPermission($permission);
+        // $permission = 'role.view';
+        // $userPermission = $this->DashboardService->checkPermission($permission);
 
-        if (isset($userPermission) && !empty($userPermission)) {
-            return $userPermission;
-        }
+        // if (isset($userPermission) && !empty($userPermission)) {
+        //     return $userPermission;
+        // }
 
         $roles = $this->RolePermissionService->getAllRole();
 
@@ -41,12 +41,12 @@ class RolePermissionController extends Controller
 
     public function create(Request $request)
     {
-        $permission = 'role.create';
-        $userPermission = $this->DashboardService->checkPermission($permission);
+        // $permission = 'role.create';
+        // $userPermission = $this->DashboardService->checkPermission($permission);
 
-        if (isset($userPermission) && !empty($userPermission)) {
-            return $userPermission;
-        }
+        // if (isset($userPermission) && !empty($userPermission)) {
+        //     return $userPermission;
+        // }
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|unique:roles,name|max:50',
@@ -68,12 +68,12 @@ class RolePermissionController extends Controller
 
     public function update(Request $request)
     {
-        $permission = 'role.edit';
-        $userPermission = $this->DashboardService->checkPermission($permission);
+        // $permission = 'role.edit';
+        // $userPermission = $this->DashboardService->checkPermission($permission);
 
-        if (isset($userPermission) && !empty($userPermission)) {
-            return $userPermission;
-        }
+        // if (isset($userPermission) && !empty($userPermission)) {
+        //     return $userPermission;
+        // }
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|max:50|unique:roles,name,' . $request->role_id,
@@ -95,12 +95,12 @@ class RolePermissionController extends Controller
 
     public function destroy($role_id)
     {
-        $permission = 'role.delete';
-        $userPermission = $this->DashboardService->checkPermission($permission);
+        // $permission = 'role.delete';
+        // $userPermission = $this->DashboardService->checkPermission($permission);
 
-        if (!empty($userPermission)) {
-            return $userPermission;
-        }
+        // if (!empty($userPermission)) {
+        //     return $userPermission;
+        // }
         // Check if the role exists
         $role = Role::find($role_id);
         if (!$role) {
