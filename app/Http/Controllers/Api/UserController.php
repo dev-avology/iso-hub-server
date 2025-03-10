@@ -121,4 +121,23 @@ class UserController extends Controller
         }
         return response()->json(['error' => 'No file uploaded'], 400);
     }
+
+    public function getUserPermission($user_id){
+        // Find user by email
+        $user = User::where('id', $user_id)->first();
+        
+        if (!$user) {
+            return ApiResponseService::error('User not found', 404);
+        }
+
+        $roles = $user->getRoleNames(); // Returns a collection of role names
+        $permissions = $user->getAllPermissions()->pluck('name'); // Get all permissions assigned
+
+        return response()->json([
+            'message' => 'User permissions fetched successfully',
+            'user' => $user,
+            'roles' => $roles, // List of roles
+            'permissions' => $permissions, // List of permissions
+        ]);
+    }
 }
