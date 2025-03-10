@@ -9,6 +9,7 @@ use App\Services\UserService;
 use App\Services\DashboardService;
 use App\Services\ApiResponseService; // Import API response service
 use App\Models\User;
+use App\Models\UploadFiles;
 
 class UserController extends Controller
 {
@@ -84,7 +85,8 @@ class UserController extends Controller
         return ApiResponseService::success('User updated successfully', $user);
     }
 
-    public function destroy($user_id){
+    public function destroy($user_id)
+    {
         $user = User::find($user_id);
         if (!$user) {
             return ApiResponseService::error('User not found', 404);
@@ -97,5 +99,26 @@ class UserController extends Controller
         }
         $user = $this->UserService->destroyUser($user_id);
         return ApiResponseService::success('User deleted successfully');
+    }
+
+    public function uploadFiles(Request $request)
+    {
+        $request->validate([
+            'files' => 'required|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,csv,txt|max:5120', // Max 5MB
+            'user_id' => 'required'
+        ]);
+
+        // Store the uploaded file
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+              $path = $request->file('files')->store('uploads', 'public'); // Store in `storage/app/public/uploads`
+            }
+
+            return response()->json([
+                'message' => 'Files uploaded successfully!',
+                'file_path' => asset('storage/' . $path)
+            ], 200);
+        }
+        return response()->json(['error' => 'No file uploaded'], 400);
     }
 }

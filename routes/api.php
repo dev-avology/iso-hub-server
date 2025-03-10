@@ -20,7 +20,7 @@ use App\Http\Controllers\Api\UserController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-
+Route::post('/upload-files', [UserController::class, 'uploadFiles']);
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
@@ -39,14 +39,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::group(['prefix' => 'user'], function () {
-        // Route::get('/view', [RolePermissionController::class, 'index']);
         Route::post('/create', [UserController::class, 'create']);
         Route::put('/update', [UserController::class, 'update']);
         Route::get('/destroy/{user_id}', [UserController::class, 'destroy']);
     });
-
-    Route::post('/assign-role', [RolePermissionController::class, 'assignRole']);
-    Route::post('/assign-permission', [RolePermissionController::class, 'assignPermission']);
-    
-
 });
