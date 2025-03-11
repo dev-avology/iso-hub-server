@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\TeamMember;
 use App\Models\Vendor;
+use App\Models\UploadFiles;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
@@ -115,5 +116,23 @@ class UserService
         // Delete the user
         $user->delete();
         return true;
+    }
+
+    public function uploadFiles($request){
+        $paths = [];
+        // Store each uploaded file
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                $storedPath = $file->store('uploads', 'public');
+                $images = [
+                    'user_id' => $request->user_id,
+                    'file_path' => asset('storage/' . $storedPath) // Correct path
+                ];
+                UploadFiles::create($images);
+                $paths[] = asset('storage/' . $storedPath);
+            }
+            $uploaded_files = array_map(fn($path) => asset($path), $paths);
+        }
+        return $uploaded_files;
     }
 }
