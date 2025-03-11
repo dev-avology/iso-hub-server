@@ -262,12 +262,12 @@ class UserController extends Controller
     {
         $request->validate([
             'files' => 'required',
-            'files.*' => 'mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,csv,txt|max:5120', // Each file max 5MB
+            'files.*' => 'mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,csv,txt', // Each file max 5MB
             'user_id' => 'required'
         ]);
 
         $fileUploades = $this->UserService->uploadFiles($request);
-        
+
         if($fileUploades){
             return ApiResponseService::success('Files uploaded successfully!', $fileUploades);
         }
