@@ -3,53 +3,34 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-
-use App\Models\UploadFiles; // Change this to your actual model name
+use App\Models\UploadFiles;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 class DeleteOldFiles extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
+    protected $signature = 'files:cleanup';
+    protected $description = 'Delete files older than 180 days from storage and database';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-    protected $signature = 'app:delete-old-files';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Delete files that are older than 180 days from storage and database';
-
-    /**
-     * Execute the console command.
-     */
     public function handle()
     {
-        // Get the date 180 days ago
-        $date = Carbon::now()->subDays(180);
-
-        // Fetch files older than 180 days
-        $oldFiles = UploadFiles::where('updated_at', '<', $date)->get();
+        // Get all files older than 180 days
+        $oldFiles = UploadFiles::where('created_at', '<', Carbon::now()->subDays(180))->get();
 
         foreach ($oldFiles as $file) {
+            // Extract the storage path
+            $filePath = str_replace(asset('storage/'), '', $file->file_path);
+
             // Delete file from storage
-            if (Storage::exists($file->file_path)) {
-                Storage::delete($file->file_path);
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
+                $this->info("Deleted file: " . $filePath);
             }
 
             // Delete record from database
             $file->delete();
         }
 
-        $this->info(count($oldFiles) . ' old files deleted successfully.');
+        $this->info('Old files cleanup completed.');
     }
 }
