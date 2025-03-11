@@ -203,27 +203,6 @@ class UserController extends Controller
         return ApiResponseService::success('Vendor deleted successfully');
     }
 
-    public function uploadFiles(Request $request)
-    {
-        $request->validate([
-            'files' => 'required|mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,csv,txt|max:5120', // Max 5MB
-            'user_id' => 'required'
-        ]);
-
-        // Store the uploaded file
-        if ($request->hasFile('files')) {
-            foreach ($request->file('files') as $file) {
-                $path = $request->file('files')->store('uploads', 'public');
-            }
-
-            return response()->json([
-                'message' => 'Files uploaded successfully!',
-                'file_path' => asset('storage/' . $path)
-            ], 200);
-        }
-        return response()->json(['error' => 'No file uploaded'], 400);
-    }
-
     public function getUserPermission($user_id)
     {
         // Find user by email
@@ -232,16 +211,14 @@ class UserController extends Controller
         if (!$user) {
             return ApiResponseService::error('User not found', 404);
         }
-
         $roles = $user->getRoleNames(); // Returns a collection of role names
         $permissions = $user->getAllPermissions()->pluck('name'); // Get all permissions assigned
-
-        return response()->json([
-            'message' => 'User permissions fetched successfully',
+        $data = [
             'user' => $user,
             'roles' => $roles, // List of roles
             'permissions' => $permissions, // List of permissions
-        ]);
+        ];
+        return ApiResponseService::success('User permissions fetched successfully', $data);
     }
 
     public function getUsers(Request $request)
@@ -255,13 +232,8 @@ class UserController extends Controller
         if ($request->role_id) {
             $query->where('role_id', $request->role_id);
         }
-
         $users = $query->get();
-
-        return response()->json([
-            'message' => 'User lists fetched successfully',
-            'user' => $users,
-        ]);
+        return ApiResponseService::success('User lists fetched successfully', $users);
     }
 
     public function getTeamMembersList(Request $request)
@@ -271,13 +243,8 @@ class UserController extends Controller
         if ($request->id) {
             $query->where('id', $request->id);
         }
-
-        $users = $query->get();
-
-        return response()->json([
-            'message' => 'Team member lists fetched successfully',
-            'team_members' => $users,
-        ]);
+        $team_members = $query->get();
+        return ApiResponseService::success('Team member lists fetched successfully', $team_members);
     }
 
     public function getVendorsList(Request $request)
@@ -287,12 +254,23 @@ class UserController extends Controller
         if ($request->id) {
             $query->where('id', $request->id);
         }
+        $vendors = $query->get();
+        return ApiResponseService::success('Vendor lists fetched successfully', $vendors);
+    }
 
-        $users = $query->get();
-
-        return response()->json([
-            'message' => 'Vendor lists fetched successfully',
-            'vendors' => $users,
+    public function uploadFiles(Request $request)
+    {
+        $request->validate([
+            'files' => 'required',
+            'files.*' => 'mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,csv,txt', // Each file max 5MB
+            'user_id' => 'required'
         ]);
+
+        $fileUploades = $this->UserService->uploadFiles($request);
+
+        if($fileUploades){
+            return ApiResponseService::success('Files uploaded successfully!', $fileUploades);
+        }
+        return ApiResponseService::error('No file uploaded', 400);
     }
 }
