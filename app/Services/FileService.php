@@ -18,10 +18,12 @@ class FileService
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
                 $storedPath = $file->store('uploads', 'public');
+                $original_name = $file->getClientOriginalName();
                 $images = [
                     'user_id' => $user_id,
                     'file_path' => asset('storage/' . $storedPath), // Correct path
-                    'prospect_name' => $name // Correct path
+                    'prospect_name' => $name, // Correct path
+                    'original_name' => $original_name
                 ];
                 UploadFiles::create($images);
                 $paths[] = asset('storage/' . $storedPath);
