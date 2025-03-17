@@ -28,10 +28,25 @@ class FileController extends Controller
 
     public function uploadFiles(Request $request)
     {
-        // Decrypt and decode the data
-        $decryptedData = json_decode(decrypt($request->query('data')), true);
-        $userId = $decryptedData['user_id'] ?? null;
-        $name = $decryptedData['name'] ?? null;
+        // Get 'data' from query string manually (for POST requests)
+        $queryData = $_GET['data'] ?? $request->query('data');
+
+        if (!$queryData) {
+            return ApiResponseService::error('Missing encrypted data', 400);
+        }
+
+        try {
+            // Decrypt and decode the data from the URL
+            $decryptedData = json_decode(decrypt(urldecode($queryData)), true);
+            $userId = $decryptedData['user_id'] ?? null;
+            $name = $decryptedData['name'] ?? null;
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            return ApiResponseService::error('Invalid encrypted data', 400);
+        }
+        // // Decrypt and decode the data
+        // $decryptedData = json_decode(decrypt($request->query('data')), true);
+        // $userId = $decryptedData['user_id'] ?? null;
+        // $name = $decryptedData['name'] ?? null;
 
         $request->validate([
             'files' => 'required',
