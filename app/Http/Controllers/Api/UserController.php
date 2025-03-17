@@ -11,7 +11,9 @@ use App\Services\DashboardService;
 use App\Services\ApiResponseService; // Import API response service
 use App\Models\User;
 use App\Models\UploadFiles;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Vendor;
+use App\Mail\ProspectMail;
 
 class UserController extends Controller
 {
@@ -260,17 +262,50 @@ class UserController extends Controller
 
     public function uploadFiles(Request $request)
     {
+        // Decrypt and decode the data
+        $decryptedData = json_decode(decrypt($request->query('data')), true);
+        $userId = $decryptedData['user_id'] ?? null;
+
         $request->validate([
             'files' => 'required',
             'files.*' => 'mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,csv,txt', // Each file max 5MB
-            'user_id' => 'required'
+            // 'user_id' => 'required'
         ]);
 
-        $fileUploades = $this->UserService->uploadFiles($request);
+        $fileUploades = $this->UserService->uploadFiles($request,$userId);
 
         if($fileUploades){
             return ApiResponseService::success('Files uploaded successfully!', $fileUploades);
         }
         return ApiResponseService::error('No file uploaded', 400);
+    }
+
+    public function sendEmailToProspect(Request $request)
+    {
+        // Use Validator for detailed error handling
+        $validator = Validator::make($request->all(), [
+           'user_id' => 'required|integer',
+           'email' => 'required|email',
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $userId = $request->user_id;
+        $emailId = $request->email;
+
+        $data = [
+            'user_id' => $userId,
+            'email' => $emailId
+        ];
+
+        Mail::to($emailId)->send(new ProspectMail('1', 'ashishyadav.avology@gmail.com'));
+
+        return ApiResponseService::success('Email sent successfully', $data);
     }
 }
