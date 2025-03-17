@@ -265,14 +265,24 @@ class UserController extends Controller
         // Decrypt and decode the data
         $decryptedData = json_decode(decrypt($request->query('data')), true);
         $userId = $decryptedData['user_id'] ?? null;
+        $name = $decryptedData['name'] ?? null;
 
         $request->validate([
             'files' => 'required',
             'files.*' => 'mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,csv,txt', // Each file max 5MB
-            // 'user_id' => 'required'
+            'unique_string' => 'required'
         ]);
 
-        $fileUploades = $this->UserService->uploadFiles($request,$userId);
+        // Check if the unique_string exists for the user in the database
+        $user = User::where('id', $userId)
+        ->where('unique_string', $request->unique_string)
+        ->first();
+
+        if (!$user) {
+            return ApiResponseService::error('Invalid unique string for this user', 400);
+        }
+
+        $fileUploades = $this->UserService->uploadFiles($request,$userId, $name);
 
         if($fileUploades){
             return ApiResponseService::success('Files uploaded successfully!', $fileUploades);
@@ -286,6 +296,7 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
            'user_id' => 'required|integer',
            'email' => 'required|email',
+           'name' => 'required',
         ]);
 
         // Return validation errors if any
@@ -298,13 +309,15 @@ class UserController extends Controller
 
         $userId = $request->user_id;
         $emailId = $request->email;
+        $name = $request->name;
 
         $data = [
             'user_id' => $userId,
-            'email' => $emailId
+            'email' => $emailId,
+            'name' => $name
         ];
 
-        Mail::to($emailId)->send(new ProspectMail($userId, $emailId));
+        Mail::to($emailId)->send(new ProspectMail($userId, $emailId, $name));
 
         return ApiResponseService::success('Email sent successfully', $data);
     }
