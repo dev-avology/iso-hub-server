@@ -321,4 +321,9 @@ class UserController extends Controller
 
         return ApiResponseService::success('Email sent successfully', $data);
     }
+
+    public function getProspectFiles($id){
+        $files = UploadFiles::where('user_id',$id)->get();
+        return ApiResponseService::success('Files lists fetched successfully', $files);
+    }
 }

@@ -45,6 +45,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/destroy/{id}', [UserController::class, 'destroyUser']);
         Route::post('/lists', [UserController::class, 'getUsers']);
         Route::post('/send-mail', [UserController::class, 'sendEmailToProspect']);
+        Route::get('/get-files/{id}', [UserController::class, 'getProspectFiles']);
     });
 
     Route::group(['prefix' => 'team-member'], function () {
