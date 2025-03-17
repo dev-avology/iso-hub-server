@@ -275,16 +275,16 @@ class UserController extends Controller
 
         // Check if the unique_string exists for the user in the database
         $user = User::where('id', $userId)
-        ->where('unique_string', $request->unique_string)
-        ->first();
+            ->where('unique_string', $request->unique_string)
+            ->first();
 
         if (!$user) {
             return ApiResponseService::error('Invalid unique string for this user', 400);
         }
 
-        $fileUploades = $this->UserService->uploadFiles($request,$userId, $name);
+        $fileUploades = $this->UserService->uploadFiles($request, $userId, $name);
 
-        if($fileUploades){
+        if ($fileUploades) {
             return ApiResponseService::success('Files uploaded successfully!', $fileUploades);
         }
         return ApiResponseService::error('No file uploaded', 400);
@@ -294,9 +294,9 @@ class UserController extends Controller
     {
         // Use Validator for detailed error handling
         $validator = Validator::make($request->all(), [
-           'user_id' => 'required|integer',
-           'email' => 'required|email',
-           'name' => 'required',
+            'user_id' => 'required|integer',
+            'email' => 'required|email',
+            'name' => 'required',
         ]);
 
         // Return validation errors if any
@@ -322,8 +322,29 @@ class UserController extends Controller
         return ApiResponseService::success('Email sent successfully', $data);
     }
 
-    public function getProspectFiles($id){
-        $files = UploadFiles::where('user_id',$id)->get();
+    public function getProspectFiles($id)
+    {
+        $files = UploadFiles::where('user_id', $id)->get();
         return ApiResponseService::success('Files lists fetched successfully', $files);
+    }
+
+    public function downloadFile($id)
+    {
+        // Find the file by ID
+        $file = UploadFiles::find($id);
+
+        if (!$file || !$file->file_path) {
+            return ApiResponseService::error('File not found', 404);
+        }
+
+        // Define the full file path
+        $filePath = public_path($file->file_path);
+
+        // Check if file exists
+        if (!file_exists($filePath)) {
+            return ApiResponseService::error('File does not exist on the server', 404);
+        }
+        // Return the file as a download
+        return response()->download($filePath, $file->original_name);
     }
 }
