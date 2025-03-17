@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\RolePermissionController;
 use App\Http\Controllers\Api\UserController;
 
@@ -20,7 +21,7 @@ use App\Http\Controllers\Api\UserController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/upload-files', [UserController::class, 'uploadFiles']);
+Route::post('/upload-files', [FileController::class, 'uploadFiles']);
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
@@ -45,7 +46,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/destroy/{id}', [UserController::class, 'destroyUser']);
         Route::post('/lists', [UserController::class, 'getUsers']);
         Route::post('/send-mail', [UserController::class, 'sendEmailToProspect']);
-        Route::get('/get-files/{id}', [UserController::class, 'getProspectFiles']);
     });
 
     Route::group(['prefix' => 'team-member'], function () {
@@ -60,6 +60,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/update', [UserController::class, 'updateVendor']);
         Route::get('/destroy/{id}', [UserController::class, 'destroyVendor']);
         Route::post('/lists', [UserController::class, 'getVendorsList']);
+    });
+
+    Route::group(['prefix' => 'file'], function () {
+        Route::get('/lists/{id}', [FileController::class, 'getProspectFiles']);
+        Route::get('/delete/{id}', [FileController::class, 'destroyFile']);
+        Route::get('/download/{id}', [FileController::class, 'downloadFile']);
     });
 
 
