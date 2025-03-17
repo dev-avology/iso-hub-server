@@ -14,15 +14,17 @@ class ProspectMail extends Mailable
     use Queueable, SerializesModels;
     public $encryptedLink;
     protected $email;
+    public $name;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($userId, $email_id)
+    public function __construct($userId, $email_id, $name)
     {
         // Encrypt user_id and email_id
         $this->email = $email_id;
-        $encryptedData = encrypt(json_encode(['user_id' => $userId, 'email_id' => $email_id]));
+        $this->name = $name;
+        $encryptedData = encrypt(json_encode(['user_id' => $userId, 'email_id' => $email_id, 'name' => $name]));
 
         // Get the secure upload URL from .env
         $this->encryptedLink = env('SECURE_UPLOAD_URL') . "?data=" . urlencode($encryptedData);
@@ -33,6 +35,10 @@ class ProspectMail extends Mailable
         return $this->from(env('MAIL_FROM_ADDRESS'))
             ->subject('Upload files on ISO HUB')
             ->view('mail.prospect')
-            ->with('secureUploadLink', $this->encryptedLink);
+            // ->with('secureUploadLink', $this->encryptedLink);
+            ->with([
+                'secureUploadLink' => $this->encryptedLink,
+                'name' => $this->name, // Pass prospect name
+            ]);
     }
 }

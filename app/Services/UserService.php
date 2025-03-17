@@ -37,7 +37,14 @@ class UserService
             'phone' => $request->phone,
             'role_id' => $request->role_id,
             'password' => Hash::make($request->password), // Encrypt password
+            'unique_string' => Str::random(32),
         ]);
+
+        // Assign role to user
+        $role = Role::where('id', $user->role_id)->first();
+        if ($role) {
+            $user->assignRole($role);
+        }
 
         return $user;
     }
@@ -118,7 +125,7 @@ class UserService
         return true;
     }
 
-    public function uploadFiles($request,$user_id){
+    public function uploadFiles($request,$user_id, $name){
         $paths = [];
         // Store each uploaded file
         if ($request->hasFile('files')) {
@@ -126,7 +133,8 @@ class UserService
                 $storedPath = $file->store('uploads', 'public');
                 $images = [
                     'user_id' => $user_id,
-                    'file_path' => asset('storage/' . $storedPath) // Correct path
+                    'file_path' => asset('storage/' . $storedPath), // Correct path
+                    'name' => $name // Correct path
                 ];
                 UploadFiles::create($images);
                 $paths[] = asset('storage/' . $storedPath);
