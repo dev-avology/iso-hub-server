@@ -21,7 +21,7 @@ class FileService
                 $images = [
                     'user_id' => $user_id,
                     'file_path' => asset('storage/' . $storedPath), // Correct path
-                    'name' => $name // Correct path
+                    'prospect_name' => $name // Correct path
                 ];
                 UploadFiles::create($images);
                 $paths[] = asset('storage/' . $storedPath);
