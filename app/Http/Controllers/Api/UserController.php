@@ -304,7 +304,7 @@ class UserController extends Controller
             'email' => $emailId
         ];
 
-        Mail::to($emailId)->send(new ProspectMail('1', 'ashishyadav.avology@gmail.com'));
+        Mail::to($emailId)->send(new ProspectMail($userId, $emailId));
 
         return ApiResponseService::success('Email sent successfully', $data);
     }
