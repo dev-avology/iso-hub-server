@@ -12,6 +12,6 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-       'secure-upload', // Add this if your API doesn't require CSRF protection
+        //
     ];
 }
