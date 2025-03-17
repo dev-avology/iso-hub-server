@@ -16,6 +16,8 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+    // 'secure_upload_url' => env('SECURE_UPLOAD_URL', 'http://localhost:5173/secure-upload'),
+
 
     /*
     |--------------------------------------------------------------------------

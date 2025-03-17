@@ -118,14 +118,14 @@ class UserService
         return true;
     }
 
-    public function uploadFiles($request){
+    public function uploadFiles($request,$user_id){
         $paths = [];
         // Store each uploaded file
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
                 $storedPath = $file->store('uploads', 'public');
                 $images = [
-                    'user_id' => $request->user_id,
+                    'user_id' => $user_id,
                     'file_path' => asset('storage/' . $storedPath) // Correct path
                 ];
                 UploadFiles::create($images);
