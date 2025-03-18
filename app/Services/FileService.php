@@ -8,6 +8,8 @@ use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\UploadFiles;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class FileService
 {
@@ -18,10 +20,12 @@ class FileService
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
                 $storedPath = $file->store('uploads', 'public');
+                $original_name = $file->getClientOriginalName();
                 $images = [
                     'user_id' => $user_id,
                     'file_path' => asset('storage/' . $storedPath), // Correct path
-                    'prospect_name' => $name // Correct path
+                    'prospect_name' => $name, // Correct path
+                    'file_original_name' => $original_name
                 ];
                 UploadFiles::create($images);
                 $paths[] = asset('storage/' . $storedPath);
@@ -34,7 +38,13 @@ class FileService
     public function destroyFile($id)
     {
         $file = UploadFiles::findOrFail($id);
-        // Delete the user
+        // Get the file path
+        $filePath = public_path($file->file_path);
+        // Check if the file exists and delete it
+        if (File::exists($filePath)) {
+            File::delete($filePath);
+        }
+        // Delete the record from the database
         $file->delete();
         return true;
     }
