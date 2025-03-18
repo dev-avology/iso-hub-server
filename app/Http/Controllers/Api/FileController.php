@@ -26,13 +26,21 @@ class FileController extends Controller
         $this->FileService = $FileService;
     }
 
-    public function fileUploads(Request $request)
+    public function uploadFiles(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'files' => 'required',
             'files.*' => 'mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,csv,txt', // Each file max 5MB
             'unique_string' => 'required'
         ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
 
         $queryData = $request->unique_string;
 

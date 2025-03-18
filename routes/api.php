@@ -21,7 +21,7 @@ use App\Http\Controllers\Api\UserController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('file-uploads', [FileController::class, 'fileUploads']);
+Route::post('/upload-files', [FileController::class, 'uploadFiles']);
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
