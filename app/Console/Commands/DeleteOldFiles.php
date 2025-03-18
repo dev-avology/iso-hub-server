@@ -17,7 +17,7 @@ class DeleteOldFiles extends Command
     public function handle()
     {
         // Get all files older than 180 days
-        $oldFiles = UploadFiles::where('created_at', '<', Carbon::now()->subDays(1))->get();
+        $oldFiles = UploadFiles::where('created_at', '<', Carbon::now()->subDays(180))->get();
 
         foreach ($oldFiles as $file) {
             $filePath = public_path($file->file_path);
