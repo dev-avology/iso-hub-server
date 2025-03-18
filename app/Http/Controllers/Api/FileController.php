@@ -28,7 +28,6 @@ class FileController extends Controller
 
     public function fileUploads(Request $request)
     {
-        dd('test');
         $request->validate([
             'files' => 'required',
             'files.*' => 'mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,csv,txt', // Each file max 5MB
