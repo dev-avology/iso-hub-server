@@ -1,15 +1,19 @@
 <?php
 
-// Define the path to the Laravel bootstrap file
-require __DIR__ . '/../bootstrap/autoload.php';
+// Load Composer's autoload file
+require __DIR__ . '/../vendor/autoload.php';
 
+// Load the Laravel application
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
 // Create the Kernel instance
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 
 // Run the schedule:run command
-$kernel->handle(
+$status = $kernel->handle(
     $input = new Symfony\Component\Console\Input\ArgvInput,
     new Symfony\Component\Console\Output\ConsoleOutput
 );
+
+// Exit with the appropriate status code
+exit($status);
