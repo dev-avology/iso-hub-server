@@ -13,6 +13,7 @@ class UploadFiles extends Model
         'user_id',
         'file_path',
         'prospect_name',
+        'file_original_name',
         'uploaded_at'
     ];
 }
