@@ -65,7 +65,7 @@ class UserController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users,email',
             'phone' => 'required',
-            'role_id' => 'required',
+            'role_id' => 'required|integer|exists:roles,id', // Check if role_id exists
             'password' => 'required',
         ]);
 
@@ -155,7 +155,7 @@ class UserController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users,email,' . $request->id,
             'phone' => 'required',
-            'role_id' => 'required',
+            'role_id' => 'required|integer|exists:roles,id', // Check if role_id exists
         ]);
 
         // Return validation errors if any
