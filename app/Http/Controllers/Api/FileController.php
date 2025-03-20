@@ -15,6 +15,9 @@ use App\Models\UploadFiles;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Vendor;
 use App\Mail\ProspectMail;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class FileController extends Controller
 {
@@ -47,7 +50,7 @@ class FileController extends Controller
         if (!$queryData) {
             return ApiResponseService::error('Missing encrypted data', 400);
         }
- 
+
         try {
             // Decrypt and decode the data from the URL
             $decryptedData = json_decode(decrypt(urldecode($queryData)), true);
@@ -55,8 +58,8 @@ class FileController extends Controller
             $name = $decryptedData['name'] ?? null;
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
             return ApiResponseService::error('Invalid encrypted data', 400);
-        } 
-         
+        }
+
         $fileUploades = $this->FileService->uploadFiles($request, $userId, $name);
 
         if ($fileUploades) {
@@ -66,10 +69,20 @@ class FileController extends Controller
     }
 
     public function getProspectFiles($id)
-    {
-        $files = UploadFiles::where('user_id', $id)->get();
-        return ApiResponseService::success('Files lists fetched successfully', $files);
+    {      
+       $user_id = Auth::id();
+
+       if($id != $user_id){
+          return ApiResponseService::error('Unauthorized user.', 401);
+       }
+        
+        $files = Auth::user()->hasRole(['admin', 'superadmin'])
+            ? UploadFiles::all()
+            : UploadFiles::where('user_id', $id)->get();
+
+        return ApiResponseService::success('Files list fetched successfully', $files);
     }
+
 
     public function destroyFile($id)
     {
