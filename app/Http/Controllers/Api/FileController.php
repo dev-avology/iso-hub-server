@@ -69,13 +69,13 @@ class FileController extends Controller
     }
 
     public function getProspectFiles($id)
-    {      
-       $user_id = Auth::id();
+    {
+        $user_id = Auth::id();
 
-       if($id != $user_id){
-          return ApiResponseService::error('Unauthorized user.', 401);
-       }
-        
+        if ($id != $user_id) {
+            return ApiResponseService::error('Unauthorized user.', 401);
+        }
+
         $files = Auth::user()->hasRole(['admin', 'superadmin'])
             ? UploadFiles::all()
             : UploadFiles::where('user_id', $id)->get();
@@ -97,5 +97,43 @@ class FileController extends Controller
     public function downloadFile($id)
     {
         return $this->FileService->downloadFile($id);
+    }
+
+    public function checkUniqueString($string)
+    {
+        // Check if the string is provided
+        if (!$string) {
+            return ApiResponseService::error('Missing encrypted data', 400);
+        }
+
+        try {
+            // Decrypt and decode the data from the URL
+            $decryptedData = json_decode(decrypt(urldecode($string)), true);
+
+            // Check if the decrypted data is valid
+            if (!is_array($decryptedData) || !isset($decryptedData['user_id'])) {
+                return ApiResponseService::error('Invalid encrypted data', 400);
+            }
+
+            $userId = $decryptedData['user_id'];
+            $name = $decryptedData['name'] ?? null;
+
+            // Check if user_id exists in the users table
+            $user = User::find($userId);
+
+            if (!$user) {
+                return ApiResponseService::error('Invalid encrypted data', 400);
+            }
+
+            // Return success with user data if everything is valid
+            return ApiResponseService::success('Data verified successfully', [
+                'user_id' => $user->id,
+                'name' => $name,
+                'string' => $string
+            ]);
+        } catch (\Exception $e) {
+            // Handle decryption error or invalid string
+            return ApiResponseService::error('Invalid encrypted data format', 400);
+        }
     }
 }

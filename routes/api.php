@@ -66,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/lists/{id}', [FileController::class, 'getProspectFiles']);
         Route::get('/delete/{id}', [FileController::class, 'destroyFile']);
         Route::get('/download/{id}', [FileController::class, 'downloadFile']);
+        Route::get('/check-unique-string/{string}', [FileController::class, 'checkUniqueString']);
     });
 
 
