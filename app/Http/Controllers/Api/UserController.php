@@ -358,7 +358,7 @@ class UserController extends Controller
 
         $userId = Auth::id();
         if($request->user_id != $userId){
-            return ApiResponseService::error('Unauthorized user.', 404);
+            return ApiResponseService::error('Unauthorized user.', 401);
         }
         $emailId = $request->email;
         $name = $request->name;
