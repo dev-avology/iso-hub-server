@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\UserController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/upload-files', [FileController::class, 'uploadFiles']);
+Route::get('/file/check-unique-string/{string}', [FileController::class, 'checkUniqueString']);
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
@@ -66,7 +67,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/lists/{id}', [FileController::class, 'getProspectFiles']);
         Route::get('/delete/{id}', [FileController::class, 'destroyFile']);
         Route::get('/download/{id}', [FileController::class, 'downloadFile']);
-        Route::get('/check-unique-string/{string}', [FileController::class, 'checkUniqueString']);
     });
 
 
