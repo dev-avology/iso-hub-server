@@ -31,7 +31,7 @@ class DashboardService
 
         // Check if the required permission exists in the user's permissions array
         if (!in_array($permission, $userPermissions)) {
-            return ApiResponseService::error('Sorry! You are Unauthorized to view the dashboard.', 403);
+            return ApiResponseService::error('Sorry! You are unauthorized for this operation.', 403);
         }else{
             return null;
         }

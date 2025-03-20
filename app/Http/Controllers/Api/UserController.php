@@ -14,6 +14,7 @@ use App\Models\UploadFiles;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Vendor;
 use App\Mail\ProspectMail;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -44,12 +45,12 @@ class UserController extends Controller
             ], 422);
         }
 
-        // $permission = 'user.add';
-        // $userPermission = $this->DashboardService->checkPermission($permission);
+        $permission = 'team_member.add';
+        $userPermission = $this->DashboardService->checkPermission($permission);
 
-        // if (!empty($userPermission)) {
-        //     return $userPermission;
-        // }
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
 
         $user = $this->UserService->addTeamMember($request);
 
@@ -76,12 +77,12 @@ class UserController extends Controller
             ], 422);
         }
 
-        // $permission = 'user.add';
-        // $userPermission = $this->DashboardService->checkPermission($permission);
+        $permission = 'user.add';
+        $userPermission = $this->DashboardService->checkPermission($permission);
 
-        // if (!empty($userPermission)) {
-        //     return $userPermission;
-        // }
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
 
         $user = $this->UserService->addUser($request);
 
@@ -105,6 +106,14 @@ class UserController extends Controller
                 'errors' => $validator->errors(),
             ], 422);
         }
+
+        $permission = 'vendor.add';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $user = $this->UserService->addVendor($request);
         return ApiResponseService::success('Vendor added successfully', $user);
     }
@@ -127,6 +136,14 @@ class UserController extends Controller
                 'errors' => $validator->errors(),
             ], 422);
         }
+
+        $permission = 'team_member.edit';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $user = $this->UserService->updateTeamMember($request);
         return ApiResponseService::success('Team member updated successfully', $user);
     }
@@ -148,6 +165,14 @@ class UserController extends Controller
                 'errors' => $validator->errors(),
             ], 422);
         }
+
+        $permission = 'user.edit';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $user = $this->UserService->updateUser($request);
         return ApiResponseService::success('User updated successfully', $user);
     }
@@ -170,6 +195,14 @@ class UserController extends Controller
                 'errors' => $validator->errors(),
             ], 422);
         }
+
+        $permission = 'vendor.edit';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $user = $this->UserService->updateVendor($request);
         return ApiResponseService::success('Vendor updated successfully', $user);
     }
@@ -177,6 +210,14 @@ class UserController extends Controller
 
     public function destroyTeamMember($id)
     {
+
+        $permission = 'team_member.delete';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $user = TeamMember::find($id);
         if (!$user) {
             return ApiResponseService::error('Team member not found', 404);
@@ -191,12 +232,28 @@ class UserController extends Controller
         if (!$user) {
             return ApiResponseService::error('User not found', 404);
         }
+
+        $permission = 'user.delete';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $user = $this->UserService->destroyUser($id);
         return ApiResponseService::success('User deleted successfully');
     }
 
     public function destroyVendor($id)
     {
+
+        $permission = 'vendor.delete';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $user = Vendor::find($id);
         if (!$user) {
             return ApiResponseService::error('Vendor not found', 404);
@@ -225,6 +282,13 @@ class UserController extends Controller
 
     public function getUsers(Request $request)
     {
+        $permission = 'user.view';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $query = User::query();
 
         if ($request->user_id) {
@@ -240,6 +304,14 @@ class UserController extends Controller
 
     public function getTeamMembersList(Request $request)
     {
+
+        $permission = 'team_member.view';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $query = TeamMember::query();
 
         if ($request->id) {
@@ -251,6 +323,13 @@ class UserController extends Controller
 
     public function getVendorsList(Request $request)
     {
+        $permission = 'vendor.view';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $query = Vendor::query();
 
         if ($request->id) {
@@ -277,7 +356,10 @@ class UserController extends Controller
             ], 422);
         }
 
-        $userId = $request->user_id;
+        $userId = Auth::id();
+        if($request->user_id != $userId){
+            return ApiResponseService::error('Unauthorized user.', 404);
+        }
         $emailId = $request->email;
         $name = $request->name;
 
