@@ -25,6 +25,30 @@ class RolePermissionSeeder extends Seeder
                     'team_member.delete',
                     'team_member.view',
                 ]
+            ],
+            [
+                'group_name' => 'vendor',
+                'permissions' => [
+                    'vendor.add',
+                    'vendor.edit',
+                    'vendor.delete',
+                    'vendor.view',
+                ]
+            ],
+            [
+                'group_name' => 'user',
+                'permissions' => [
+                    'user.add',
+                    'user.edit',
+                    'user.delete',
+                    'user.view'
+                ]
+            ],
+            [
+                'group_name' => 'secure_file_uploads',
+                'permissions' => [
+                    'secure_file_uploads.view'
+                ]
             ]
         ];
 
