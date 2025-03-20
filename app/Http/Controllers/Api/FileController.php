@@ -126,10 +126,7 @@ class FileController extends Controller
             }
 
             // Return success with user data if everything is valid
-            return ApiResponseService::success('Data verified successfully', [
-                'name' => $name,
-                'string' => $string
-            ]);
+            return ApiResponseService::success('Data verified successfully');
         } catch (\Exception $e) {
             // Handle decryption error or invalid string
             return ApiResponseService::error('Invalid encrypted data format', 400);
