@@ -127,7 +127,6 @@ class FileController extends Controller
 
             // Return success with user data if everything is valid
             return ApiResponseService::success('Data verified successfully', [
-                'user_id' => $user->id,
                 'name' => $name,
                 'string' => $string
             ]);
