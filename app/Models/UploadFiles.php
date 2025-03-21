@@ -14,6 +14,7 @@ class UploadFiles extends Model
         'file_path',
         'prospect_name',
         'file_original_name',
+        'email',
         'uploaded_at'
     ];
 }
