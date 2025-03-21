@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\File;
 
 class FileService
 {
-    public function uploadFiles($request, $user_id, $name)
+    public function uploadFiles($request, $user_id, $name, $email_id)
     {
         $paths = [];
         // Store each uploaded file
@@ -25,7 +25,8 @@ class FileService
                     'user_id' => $user_id,
                     'file_path' => asset('storage/' . $storedPath), // Correct path
                     'prospect_name' => $name, // Correct path
-                    'file_original_name' => $original_name
+                    'file_original_name' => $original_name,
+                    'email' => $email_id
                 ];
                 UploadFiles::create($images);
                 $paths[] = asset('storage/' . $storedPath);

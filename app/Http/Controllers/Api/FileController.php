@@ -56,11 +56,12 @@ class FileController extends Controller
             $decryptedData = json_decode(decrypt(urldecode($queryData)), true);
             $userId = $decryptedData['user_id'] ?? null;
             $name = $decryptedData['name'] ?? null;
+            $email_id = $decryptedData['email_id'] ?? null;
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
             return ApiResponseService::error('Invalid encrypted data', 400);
         }
 
-        $fileUploades = $this->FileService->uploadFiles($request, $userId, $name);
+        $fileUploades = $this->FileService->uploadFiles($request, $userId, $name, $email_id);
 
         if ($fileUploades) {
             return ApiResponseService::success('Files uploaded successfully!', $fileUploades);
