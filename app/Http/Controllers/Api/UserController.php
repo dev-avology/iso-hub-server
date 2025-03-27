@@ -246,7 +246,6 @@ class UserController extends Controller
 
     public function destroyVendor($id)
     {
-
         $permission = 'vendor.delete';
         $userPermission = $this->DashboardService->checkPermission($permission);
 

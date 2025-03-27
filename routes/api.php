@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\RolePermissionController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\GoogleDriveController;
+use App\Http\Controllers\Api\JotFromController;
 use App\Http\Controllers\Api\NewGoogleDriveController;
 
 /*
@@ -24,6 +25,7 @@ use App\Http\Controllers\Api\NewGoogleDriveController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/upload-files', [FileController::class, 'uploadFiles']);
+Route::post('/jot-froms', [JotFromController::class, 'createForm']);
 Route::get('/file/check-unique-string/{string}', [FileController::class, 'checkUniqueString']);
 
 // Get Google Auth URL
