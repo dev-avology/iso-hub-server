@@ -7,6 +7,9 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\RolePermissionController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\GoogleDriveController;
+use App\Http\Controllers\Api\JotFromController;
+use App\Http\Controllers\Api\NewGoogleDriveController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,7 +25,17 @@ use App\Http\Controllers\Api\UserController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/upload-files', [FileController::class, 'uploadFiles']);
+Route::post('/jot-froms', [JotFromController::class, 'createForm']);
 Route::get('/file/check-unique-string/{string}', [FileController::class, 'checkUniqueString']);
+
+// Get Google Auth URL
+// Route::get('google/auth-url', [GoogleDriveController::class, 'getAuthUrl']);
+
+// // Handle Google Callback
+// Route::get('google/callback', [GoogleDriveController::class, 'handleCallback']);
+
+// // List Google Drive Files
+// Route::get('google/files', [GoogleDriveController::class, 'listFiles']);
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
@@ -69,8 +82,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/download/{id}', [FileController::class, 'downloadFile']);
     });
 
-
-    // Route::post('/create-team-member', [UserController::class, 'teamMembercreate']);
-    // Route::put('/update-team-member', [UserController::class, 'teamMemberUpdate']);
-    // Route::get('/team-member-destroy/{user_id}', [UserController::class, 'teamMemberDestroy']);
-});
+    Route::get('google/auth', [NewGoogleDriveController::class, 'redirectToGoogle']);
+    
+    // Route::group(['prefix' => 'google'], function () {
+        //     // Get Google Auth URL
+        //     // Route::get('/auth-url', [GoogleDriveController::class, 'getAuthUrl']);
+        //     // // Handle Google Callback
+        //     // Route::get('/callback', [GoogleDriveController::class, 'handleCallback']);
+        //     // // List Google Drive Files
+        //     // Route::get('/files', [GoogleDriveController::class, 'listFiles']);
+        
+        // });
+    });
+    Route::get('google/drive/list', [NewGoogleDriveController::class, 'listFiles']);
+    Route::get('auth/google/callback', [NewGoogleDriveController::class, 'handleGoogleCallback']);
