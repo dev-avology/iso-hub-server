@@ -18,5 +18,11 @@ class JotForm extends Model
         'description',
         'signature_date',
         'signature',
+        'dba',
+        'address2',
+        'city',
+        'state',
+        'pincode',
+        'is_same_shipping_address',
     ];
 }
