@@ -33,11 +33,16 @@ class JotFromController extends Controller
     {
         // Use Validator for detailed error handling
         $validator = Validator::make($request->all(), [
-            'first_name'      => 'required|string|max:255',
-            'last_name'       => 'nullable|string|max:255',
-            'email'           => 'required|string|email|unique:jot_forms,email',
-            'phone'           => 'required|string|max:15',
+            // 'first_name'      => 'required|string|max:255',
+            // 'last_name'       => 'nullable|string|max:255',
+            'dba'           => 'required|string',
+            // 'phone'           => 'required|string|max:15',
             'description'     => 'required|string',
+            'address2'     => 'required|string',
+            'city'     => 'required|string',
+            'state'     => 'required|string',
+            'pincode'     => 'required|string',
+            'is_same_shipping_address'     => 'required|string',
             'signature_date'  => 'required|date',
             'signature'       => 'required|string',
             'unique_string'   => 'required|string'

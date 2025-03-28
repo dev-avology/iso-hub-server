@@ -19,11 +19,13 @@ class JotFormService
     public function create($request,$user_id)
     {
         $form = JotForm::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'email' => $request->email,
-            'phone' => $request->phone,
+            'dba' => $request->dba,
             'description' => $request->description,
+            'address2' => $request->address2,
+            'state' => $request->state,
+            'city' => $request->city,
+            'pincode' => $request->pincode,
+            'is_same_shipping_address' => $request->is_same_shipping_address,
             'signature_date' => $request->signature_date,
             'signature' => $request->signature,
             'user_id' => $user_id
