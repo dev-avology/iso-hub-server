@@ -85,6 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('google/auth', [NewGoogleDriveController::class, 'redirectToGoogle']);
     Route::post('jotform/lists', [JotFromController::class, 'getFormsList']);
+    Route::get('jotform/{id}', [JotFromController::class, 'getFromDetails']);
     
     
     // Route::group(['prefix' => 'google'], function () {
