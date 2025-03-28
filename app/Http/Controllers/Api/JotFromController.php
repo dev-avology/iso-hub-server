@@ -12,16 +12,21 @@ use App\Models\UploadFiles;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Vendor;
 use App\Mail\ProspectMail;
+use App\Models\JotForm;
 use Illuminate\Support\Facades\Auth;
 use App\Services\JotFormService;
+use App\Services\DashboardService;
 
 class JotFromController extends Controller
 {
     protected $JotFormService;
+    protected $UserService;
+    protected $DashboardService;
 
-    public function __construct(JotFormService $JotFormService)
+    public function __construct(JotFormService $JotFormService, DashboardService $DashboardService)
     {
         $this->JotFormService = $JotFormService;
+        $this->DashboardService = $DashboardService;
     }
 
     public function createForm(Request $request)
@@ -102,5 +107,23 @@ class JotFromController extends Controller
             // Handle decryption error or invalid string
             return ApiResponseService::error('Invalid encrypted data format', 400);
         }
+    }
+
+    public function getFormsList(Request $request)
+    {
+        $permission = 'jotform.view';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
+        $query = JotForm::query();
+
+        if ($request->id) {
+            $query->where('id', $request->id);
+        }
+        $jotforms = $query->get();
+        return ApiResponseService::success('Jotfrom lists fetched successfully', $jotforms);
     }
 }
