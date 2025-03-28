@@ -28,14 +28,14 @@ class JotFromController extends Controller
     {
         // Use Validator for detailed error handling
         $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:255',
-            'last_name' => '',
-            'email' => 'required|string|email|unique:jot_forms,email',
-            'phone' => 'required',
-            'description' => 'required',
-            'signature_date' => 'required',
-            'signature' => 'required',
-            'unique_string' => 'required'
+            'first_name'      => 'required|string|max:255',
+            'last_name'       => 'nullable|string|max:255',
+            'email'           => 'required|string|email|unique:jot_forms,email',
+            'phone'           => 'required|string|max:15',
+            'description'     => 'required|string',
+            'signature_date'  => 'required|date',
+            'signature'       => 'required|string',
+            'unique_string'   => 'required|string'
         ]);
 
         // Return validation errors if any
@@ -60,7 +60,47 @@ class JotFromController extends Controller
             return ApiResponseService::error('Invalid encrypted data', 400);
         }
 
-        $form = $this->JotFormService->create($request,$userId);
+        $form = $this->JotFormService->create($request, $userId);
         return ApiResponseService::success('Forms Created Successfully', $form);
+    }
+
+    public function jotFormcheckUniqueString($string)
+    {
+        // $encryptedData = encrypt(json_encode(['user_id' => '2', 'secret' => 'jotform_URD_!@#9823_secret$%DEC8901']));
+        // dd($encryptedData);
+
+        // Check if the string is provided
+        if (!$string) {
+            return ApiResponseService::error('Missing encrypted data', 400);
+        }
+
+        try {
+            // Decrypt and decode the data from the URL
+            $decryptedData = json_decode(decrypt(urldecode($string)), true);
+
+            // Check if the decrypted data is valid
+            if (!is_array($decryptedData) || !isset($decryptedData['user_id'])) {
+                return ApiResponseService::error('Invalid encrypted data', 400);
+            }
+
+            // Check if secret verification is required
+            if (!isset($decryptedData['secret']) || $decryptedData['secret'] !== 'jotform_URD_!@#9823_secret$%DEC8901') {
+                return ApiResponseService::error('Invalid encrypted data', 400);
+            }
+
+            $userId = $decryptedData['user_id'];
+            // Check if user_id exists in the users table
+            $user = User::find($userId);
+
+            if (!$user) {
+                return ApiResponseService::error('Invalid encrypted data', 400);
+            }
+
+            // Return success with user data if everything is valid
+            return ApiResponseService::success('Data verified successfully');
+        } catch (\Exception $e) {
+            // Handle decryption error or invalid string
+            return ApiResponseService::error('Invalid encrypted data format', 400);
+        }
     }
 }

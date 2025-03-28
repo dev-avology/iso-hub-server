@@ -27,6 +27,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/upload-files', [FileController::class, 'uploadFiles']);
 Route::post('/jot-forms', [JotFromController::class, 'createForm']);
 Route::get('/file/check-unique-string/{string}', [FileController::class, 'checkUniqueString']);
+Route::get('/jotform-check-unique-string/{string}', [JotFromController::class, 'jotFormcheckUniqueString']);
 
 // Get Google Auth URL
 // Route::get('google/auth-url', [GoogleDriveController::class, 'getAuthUrl']);
