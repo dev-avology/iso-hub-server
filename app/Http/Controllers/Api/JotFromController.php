@@ -131,4 +131,22 @@ class JotFromController extends Controller
         $jotforms = $query->get();
         return ApiResponseService::success('Jotfrom lists fetched successfully', $jotforms);
     }
+
+    public function getFromDetails($id)
+    {
+        $permission = 'jotform.view';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
+        $query = JotForm::query();
+
+        if ($id) {
+            $query->where('id', $id);
+        }
+        $jotforms = $query->get();
+        return ApiResponseService::success('Jotfrom details successfully', $jotforms);
+    }
 }
