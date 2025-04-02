@@ -29,6 +29,9 @@ Route::post('/jot-forms', [JotFromController::class, 'createForm']);
 Route::get('/file/check-unique-string/{string}', [FileController::class, 'checkUniqueString']);
 Route::get('/jotform-check-unique-string/{string}', [JotFromController::class, 'jotFormcheckUniqueString']);
 
+// Google Drive routes
+Route::get('auth/google/callback', [NewGoogleDriveController::class, 'handleGoogleCallback']);
+
 // Get Google Auth URL
 // Route::get('google/auth-url', [GoogleDriveController::class, 'getAuthUrl']);
 
@@ -46,6 +49,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/dashboard', [DashboardController::class, 'index']);
+
+    // Add Google Drive routes inside the auth middleware
+    Route::get('google/auth', [NewGoogleDriveController::class, 'redirectToGoogle']);
+    Route::post('google/callback', [NewGoogleDriveController::class, 'handleCallback']);
+    Route::get('google/drive/list', [NewGoogleDriveController::class, 'listFiles']);
 
     Route::group(['prefix' => 'role'], function () {
         Route::get('/view', [RolePermissionController::class, 'index']);
@@ -83,7 +91,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/download/{id}', [FileController::class, 'downloadFile']);
     });
 
-    Route::get('google/auth', [NewGoogleDriveController::class, 'redirectToGoogle']);
     Route::post('jotform/lists', [JotFromController::class, 'getFormsList']);
     Route::get('jotform/{id}', [JotFromController::class, 'getFromDetails']);
     
@@ -98,5 +105,3 @@ Route::middleware('auth:sanctum')->group(function () {
         
         // });
     });
-    Route::get('google/drive/list', [NewGoogleDriveController::class, 'listFiles']);
-    Route::get('auth/google/callback', [NewGoogleDriveController::class, 'handleGoogleCallback']);
