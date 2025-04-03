@@ -168,8 +168,8 @@ class JotFromController extends Controller
             'is_same_shipping_address' => 'required',
             'pincode' => 'required',
             'user_id' => 'required',
-            'signature' => 'required',
-            'signature_date' => 'required',
+            // 'signature' => 'required',
+            // 'signature_date' => 'required',
             'email' => 'required|email',
             'is_duplicate' => 'required',
         ]);
