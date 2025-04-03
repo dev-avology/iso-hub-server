@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\GoogleDriveController;
 use App\Http\Controllers\Api\JotFromController;
 use App\Http\Controllers\Api\NewGoogleDriveController;
+use App\Http\Controllers\Api\DropboxController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,11 +50,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/dashboard', [DashboardController::class, 'index']);
-
-    // Add Google Drive routes inside the auth middleware
-    Route::get('google/auth', [NewGoogleDriveController::class, 'redirectToGoogle']);
-    Route::post('google/callback', [NewGoogleDriveController::class, 'handleCallback']);
-    Route::get('google/drive/list', [NewGoogleDriveController::class, 'listFiles']);
 
     Route::group(['prefix' => 'role'], function () {
         Route::get('/view', [RolePermissionController::class, 'index']);
@@ -105,4 +101,16 @@ Route::middleware('auth:sanctum')->group(function () {
         //     // Route::get('/files', [GoogleDriveController::class, 'listFiles']);
         
         // });
-    });
+
+    // Google Drive Routes
+    Route::get('/google/redirect', [NewGoogleDriveController::class, 'redirectToGoogle']);
+    Route::post('/google/callback', [NewGoogleDriveController::class, 'handleCallback']);
+    Route::post('/google/disconnect', [NewGoogleDriveController::class, 'disconnect']);
+    Route::get('google/drive/list', [NewGoogleDriveController::class, 'listFiles']);
+
+    // Dropbox Routes
+    Route::get('/dropbox/redirect', [DropboxController::class, 'redirectToDropbox']);
+    Route::post('/dropbox/callback', [DropboxController::class, 'handleDropboxCallback']);
+    Route::post('/dropbox/disconnect', [DropboxController::class, 'disconnect']);
+    Route::get('/dropbox/list', [DropboxController::class, 'listFiles']);
+});

@@ -29,7 +29,8 @@ class User extends Authenticatable
         'phone',
         'password',
         'unique_string',
-        'google_access_token'
+        'google_access_token',
+        'dropbox_access_token',
     ];
 
     /**
