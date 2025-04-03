@@ -15,6 +15,7 @@ use App\Mail\ProspectMail;
 use App\Models\JotForm;
 use Illuminate\Support\Facades\Auth;
 use App\Services\JotFormService;
+use App\Mail\DuplicateFormMail;
 use App\Services\DashboardService;
 
 class JotFromController extends Controller
@@ -148,5 +149,61 @@ class JotFromController extends Controller
         }
         $jotforms = $query->get();
         return ApiResponseService::success('Jotfrom details successfully', $jotforms);
+    }
+
+    public function sendFormDuplicateMail(Request $request)
+    {
+        $permission = 'jotform.view';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+        // Use Validator for detailed error handling
+        $validator = Validator::make($request->all(), [
+            'dba' => 'required',
+            'description' => 'required',
+            'address2' => 'required',
+            'city' => 'required',
+            'state' => 'required',
+            'is_same_shipping_address' => 'required',
+            'pincode' => 'required',
+            'user_id' => 'required',
+            'signature' => 'required',
+            'signature_date' => 'required',
+            'email' => 'required|email',
+            'is_duplicate' => 'required',
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $userId = Auth::id();
+        if($request->user_id != $userId){
+            return ApiResponseService::error('Unauthorized user.', 401);
+        }
+
+        $data = [
+            'dba' => $request->dba,
+            'description' => $request->description,
+            'address2' => $request->address2,
+            'city' => $request->city,
+            'state' => $request->state,
+            'is_same_shipping_address' => $request->is_same_shipping_address,
+            'pincode' => $request->pincode,
+            'user_id' => $request->user_id,
+            'signature' => $request->signature,
+            'signature_date' => $request->signature_date,
+            'email' => $request->email,
+            'is_duplicate' => $request->is_duplicate,
+        ];
+
+        Mail::to($request->email)->send(new DuplicateFormMail($data));
+
+        return ApiResponseService::success('Email sent successfully', []);
     }
 }

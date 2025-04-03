@@ -24,5 +24,6 @@ class JotForm extends Model
         'state',
         'pincode',
         'is_same_shipping_address',
+        'is_duplicate'
     ];
 }
