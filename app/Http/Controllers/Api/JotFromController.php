@@ -77,9 +77,6 @@ class JotFromController extends Controller
 
     public function jotFormcheckUniqueString($string)
     {
-        // $encryptedData = encrypt(json_encode(['user_id' => '2', 'secret' => 'jotform_URD_!@#9823_secret$%DEC8901']));
-        // dd($encryptedData);
-
         // Check if the string is provided
         if (!$string) {
             return ApiResponseService::error('Missing encrypted data', 400);
@@ -88,6 +85,7 @@ class JotFromController extends Controller
         try {
             // Decrypt and decode the data from the URL
             $decryptedData = json_decode(decrypt(urldecode($string)), true);
+            // dd($decryptedData);
 
             // Check if the decrypted data is valid
             if (!is_array($decryptedData) || !isset($decryptedData['user_id'])) {
@@ -95,8 +93,10 @@ class JotFromController extends Controller
             }
 
             // Check if secret verification is required
-            if (!isset($decryptedData['secret']) || $decryptedData['secret'] !== 'jotform_URD_!@#9823_secret$%DEC8901') {
-                return ApiResponseService::error('Invalid encrypted data', 400);
+            if(!isset($decryptedData['is_duplicate'])){
+                if (!isset($decryptedData['secret']) || $decryptedData['secret'] !== 'jotform_URD_!@#9823_secret$%DEC8901') {
+                    return ApiResponseService::error('Invalid encrypted data', 400);
+                }
             }
 
             $userId = $decryptedData['user_id'];
@@ -107,8 +107,22 @@ class JotFromController extends Controller
                 return ApiResponseService::error('Invalid encrypted data', 400);
             }
 
+            $data = [];
+
+            if (isset($decryptedData['is_duplicate'])) {
+                // $data['user_id'] = $decryptedData['user_id'];
+                $data['address2'] = $decryptedData['address2'];
+                $data['city'] = $decryptedData['city'];
+                $data['dba'] = $decryptedData['dba'];
+                $data['description'] = $decryptedData['description'];
+                // $data['email'] = $decryptedData['email'];
+                $data['is_same_shipping_address'] = $decryptedData['is_same_shipping_address'];
+                $data['pincode'] = $decryptedData['pincode'];
+                $data['state'] = $decryptedData['state'];
+                $data['is_duplicate'] = $decryptedData['is_duplicate'];
+            }
             // Return success with user data if everything is valid
-            return ApiResponseService::success('Data verified successfully');
+            return ApiResponseService::success('Data verified successfully', $data);
         } catch (\Exception $e) {
             // Handle decryption error or invalid string
             return ApiResponseService::error('Invalid encrypted data format', 400);
