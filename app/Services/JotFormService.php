@@ -28,8 +28,7 @@ class JotFormService
             'is_same_shipping_address' => $request->is_same_shipping_address,
             'signature_date' => $request->signature_date,
             'signature' => $request->signature,
-            'user_id' => $user_id,
-            'is_duplicate' => isset($request->is_duplicate) ? '1' : '0' 
+            'user_id' => $user_id
         ]);
         return $form;
     }

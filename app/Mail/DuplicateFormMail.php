@@ -25,7 +25,7 @@ class DuplicateFormMail extends Mailable
         $encryptedData = encrypt(json_encode($this->data));
 
         // Get the secure upload URL from .env
-        $this->encryptedLink = env('WEBSITE_URL').'jot-forms?data=' . urlencode($encryptedData);
+        $this->encryptedLink = env('WEBSITE_URL').'jot-forms'. "?data=" . urlencode($encryptedData);
     }
     
     public function build()
