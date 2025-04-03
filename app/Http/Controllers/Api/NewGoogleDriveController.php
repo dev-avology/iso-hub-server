@@ -36,6 +36,8 @@ class NewGoogleDriveController extends Controller
             $client->setIncludeGrantedScopes(true);
 
             $authUrl = $client->createAuthUrl();
+            $authUrl .= (strpos($authUrl, '?') !== false ? '&' : '?') . 'source=google';
+
             return response()->json([
                 'status' => 'success',
                 'redirect_url' => $authUrl,
@@ -56,6 +58,11 @@ class NewGoogleDriveController extends Controller
     public function handleCallback(Request $request)
     {
         try {
+            \Log::info('Google callback received:', [
+                'request_data' => $request->all(),
+                'headers' => $request->headers->all()
+            ]);
+
             if (!$request->code) {
                 \Log::error('No authorization code received');
                 return response()->json([
@@ -73,6 +80,8 @@ class NewGoogleDriveController extends Controller
                 ], 401);
             }
 
+            \Log::info('Processing callback for user:', ['user_id' => $user->id]);
+
             $client = new Client();
             $client->setClientId(config('services.google.client_id'));
             $client->setClientSecret(config('services.google.client_secret'));
@@ -85,7 +94,9 @@ class NewGoogleDriveController extends Controller
             ]));
 
             try {
+                \Log::info('Attempting to fetch access token with code');
                 $token = $client->fetchAccessTokenWithAuthCode($request->code);
+                \Log::info('Successfully fetched access token');
             } catch (\Exception $e) {
                 \Log::error('Error fetching access token:', [
                     'error' => $e->getMessage(),
@@ -117,6 +128,8 @@ class NewGoogleDriveController extends Controller
             // Save access token in DB
             $user->google_access_token = json_encode($token);
             $user->save();
+            
+            \Log::info('Successfully saved Google access token for user:', ['user_id' => $user->id]);
             
             return response()->json([
                 'status' => 'success',
@@ -217,6 +230,39 @@ class NewGoogleDriveController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'An error occurred while listing files'
+            ], 500);
+        }
+    }
+
+    // Disconnect Google Drive
+    public function disconnect()
+    {
+        try {
+            $user = Auth::guard('sanctum')->user();
+            if (!$user) {
+                \Log::error('No authenticated user found');
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'User not authenticated'
+                ], 401);
+            }
+
+            // Clear the Google Drive token
+            $user->google_access_token = null;
+            $user->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Successfully disconnected from Google Drive'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error disconnecting from Google Drive:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'An error occurred while disconnecting from Google Drive'
             ], 500);
         }
     }

@@ -37,4 +37,10 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'dropbox' => [
+        'key' => env('DROPBOX_APP_KEY'),
+        'secret' => env('DROPBOX_APP_SECRET'),
+        'redirect' => env('DROPBOX_REDIRECT_URI'),
+    ],
+
 ];
