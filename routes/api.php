@@ -107,9 +107,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/google/disconnect', [NewGoogleDriveController::class, 'disconnect']);
     Route::get('google/drive/list', [NewGoogleDriveController::class, 'listFiles']);
 
-    // Dropbox Routes
+    // Dropbox routes
     Route::get('/dropbox/redirect', [DropboxController::class, 'redirectToDropbox']);
-    Route::post('/dropbox/callback', [DropboxController::class, 'handleDropboxCallback']);
+    Route::post('/dropbox/callback', [DropboxController::class, 'handleCallback']);
     Route::post('/dropbox/disconnect', [DropboxController::class, 'disconnect']);
     Route::get('/dropbox/list', [DropboxController::class, 'listFiles']);
 });

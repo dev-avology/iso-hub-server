@@ -28,9 +28,9 @@ class DropboxController extends Controller
 
             // Generate the OAuth 2.0 authorization URL with state parameter
             $authUrl = 'https://www.dropbox.com/oauth2/authorize?' . http_build_query([
-                'client_id' => config('services.dropbox.key'),
+                'client_id' => config('services.dropbox.app_key'),
                 'response_type' => 'code',
-                'redirect_uri' => config('services.dropbox.redirect'),
+                'redirect_uri' => config('services.dropbox.redirect_uri'),
                 'force_reapprove' => 'true',
                 'token_access_type' => 'offline',
                 'state' => 'dropbox' // Add state parameter to identify the source
@@ -58,14 +58,17 @@ class DropboxController extends Controller
         try {
             \Log::info('Dropbox callback received:', [
                 'request_data' => $request->all(),
-                'headers' => $request->headers->all()
+                'headers' => $request->headers->all(),
+                'content_type' => $request->header('Content-Type')
             ]);
 
-            if (!$request->code) {
-                \Log::error('No authorization code received');
+            // Check if the request has the code in the correct format
+            $code = $request->input('code');
+            if (!$code) {
+                \Log::error('No authorization code received in request body');
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'No authorization code received'
+                    'message' => 'No authorization code received in request body'
                 ], 400);
             }
 
@@ -82,47 +85,66 @@ class DropboxController extends Controller
 
             // Exchange the authorization code for an access token
             $client = new GuzzleClient();
-            \Log::info('Attempting to exchange code for token');
-            $response = $client->post('https://api.dropboxapi.com/oauth2/token', [
-                'form_params' => [
-                    'code' => $request->code,
-                    'grant_type' => 'authorization_code',
-                    'client_id' => config('services.dropbox.key'),
-                    'client_secret' => config('services.dropbox.secret'),
-                    'redirect_uri' => config('services.dropbox.redirect'),
-                ]
+            \Log::info('Attempting to exchange code for token with params:', [
+                'code' => $code,
+                'client_id' => config('services.dropbox.app_key'),
+                'redirect_uri' => config('services.dropbox.redirect_uri'),
             ]);
 
-            $tokenData = json_decode($response->getBody(), true);
-            \Log::info('Token response received:', ['token_data' => array_keys($tokenData)]);
+            try {
+                $response = $client->post('https://api.dropboxapi.com/oauth2/token', [
+                    'form_params' => [
+                        'code' => $code,
+                        'grant_type' => 'authorization_code',
+                        'client_id' => config('services.dropbox.app_key'),
+                        'client_secret' => config('services.dropbox.app_secret'),
+                        'redirect_uri' => config('services.dropbox.redirect_uri'),
+                    ]
+                ]);
 
-            if (!isset($tokenData['access_token'])) {
-                \Log::error('Failed to get Dropbox access token');
+                $tokenData = json_decode($response->getBody(), true);
+                \Log::info('Token response received:', ['token_data' => array_keys($tokenData)]);
+
+                if (!isset($tokenData['access_token'])) {
+                    \Log::error('Failed to get Dropbox access token:', ['response' => $tokenData]);
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Failed to get access token from Dropbox'
+                    ], 400);
+                }
+
+                // Save access token in DB
+                \Log::info('Saving access token to database');
+                $user->dropbox_access_token = $tokenData['access_token'];
+                $user->save();
+                
+                \Log::info('Successfully saved Dropbox access token for user:', ['user_id' => $user->id]);
+                
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Dropbox connected successfully'
+                ]);
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                \Log::error('Dropbox API error:', [
+                    'error' => $e->getMessage(),
+                    'response' => $e->getResponse()->getBody()->getContents(),
+                    'status' => $e->getResponse()->getStatusCode()
+                ]);
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Failed to get access token'
+                    'message' => 'Failed to authenticate with Dropbox: ' . $e->getMessage()
                 ], 400);
             }
-
-            // Save access token in DB
-            \Log::info('Saving access token to database');
-            $user->dropbox_access_token = $tokenData['access_token'];
-            $user->save();
-            
-            \Log::info('Successfully saved Dropbox access token for user:', ['user_id' => $user->id]);
-            
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Dropbox connected successfully'
-            ]);
         } catch (\Exception $e) {
             \Log::error('Error in Dropbox callback:', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
             ]);
             return response()->json([
                 'status' => 'error',
-                'message' => 'An error occurred during Dropbox authentication'
+                'message' => 'An error occurred during Dropbox authentication: ' . $e->getMessage()
             ], 500);
         }
     }
