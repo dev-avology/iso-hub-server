@@ -38,9 +38,9 @@ return [
     ],
 
     'dropbox' => [
-        'key' => env('DROPBOX_APP_KEY'),
-        'secret' => env('DROPBOX_APP_SECRET'),
-        'redirect' => env('DROPBOX_REDIRECT_URI'),
+        'app_key' => env('DROPBOX_APP_KEY'),
+        'app_secret' => env('DROPBOX_APP_SECRET'),
+        'redirect_uri' => env('DROPBOX_REDIRECT_URI'),
     ],
 
 ];
