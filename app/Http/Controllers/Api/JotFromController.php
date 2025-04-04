@@ -143,7 +143,7 @@ class JotFromController extends Controller
         if ($request->id) {
             $query->where('id', $request->id);
         }
-        $jotforms = $query->get();
+        $jotforms = $query->orderBy('created_at', 'desc')->get();
         return ApiResponseService::success('Jotfrom lists fetched successfully', $jotforms);
     }
 
@@ -161,8 +161,8 @@ class JotFromController extends Controller
         if ($id) {
             $query->where('id', $id);
         }
-        $jotforms = $query->get();
-        return ApiResponseService::success('Jotfrom details successfully', $jotforms);
+        $jotforms = $query->orderBy('created_at','desc')->get();
+        return ApiResponseService::success('Jotfrom fetched successfully', $jotforms);
     }
 
     public function sendFormDuplicateMail(Request $request)
