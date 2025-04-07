@@ -7,6 +7,7 @@ use App\Models\TeamMember;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Services\UserService;
+use App\Services\RepService;
 use App\Services\DashboardService;
 use App\Services\ApiResponseService; // Import API response service
 use App\Models\User;
@@ -14,17 +15,20 @@ use App\Models\UploadFiles;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Vendor;
 use App\Mail\ProspectMail;
+use App\Models\Rep;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     protected $UserService;
     protected $DashboardService;
+    protected $RepService;
 
-    public function __construct(UserService $UserService, DashboardService $DashboardService)
+    public function __construct(UserService $UserService, DashboardService $DashboardService,RepService $RepService)
     {
         $this->UserService = $UserService;
         $this->DashboardService = $DashboardService;
+        $this->RepService = $RepService;
     }
 
     public function createTeamMember(Request $request)
@@ -118,6 +122,67 @@ class UserController extends Controller
         return ApiResponseService::success('Vendor added successfully', $user);
     }
 
+    public function createRep(Request $request)
+    {
+        // Use Validator for detailed error handling
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:reps,email',
+            'phone' => 'required',
+            'address' => 'required',
+            'user_id' => 'required',
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $permission = 'reps';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
+        $user = $this->RepService->addRep($request);
+        return ApiResponseService::success('Rep added successfully', $user);
+    }
+
+    public function updateRep(Request $request)
+    {
+        // Use Validator for detailed error handling
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:reps,email,' . $request->id,
+            'phone' => 'required',
+            'id' => 'required|exists:reps,id',
+            'address' => 'required',
+            'user_id' => 'required'
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $permission = 'reps';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
+        $user = $this->RepService->updateRep($request);
+        return ApiResponseService::success('Rep updated successfully', $user);
+    }
+
     public function updateTeamMember(Request $request)
     {
         // Use Validator for detailed error handling
@@ -207,6 +272,22 @@ class UserController extends Controller
         return ApiResponseService::success('Vendor updated successfully', $user);
     }
 
+    public function destroyRep(Request $request)
+    {
+        $permission = 'reps';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
+        $user = Rep::find($request->id);
+        if (!$user) {
+            return ApiResponseService::error('Reps not found', 404);
+        }
+        $user = $this->RepService->destroyRep($request->id);
+        return ApiResponseService::success('Rep deleted successfully');
+    }
 
     public function destroyTeamMember($id)
     {
@@ -336,6 +417,34 @@ class UserController extends Controller
         }
         $vendors = $query->get();
         return ApiResponseService::success('Vendor lists fetched successfully', $vendors);
+    }
+
+    public function getRepsList(Request $request)
+    {
+        $permission = 'reps';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
+        $query = Rep::query();
+
+        if ($request->id) {
+            $query->where('id', $request->id);
+        }
+
+         // Fetch users with the role "rep"
+        $user_role = User::where('role_id',5)->get(); 
+
+        $reps = $query->get();
+
+        $response = [
+            'data' => $reps,
+            'user_role' => $user_role
+        ];
+
+        return ApiResponseService::success('Reps lists fetched successfully', $response);
     }
 
     public function sendEmailToProspect(Request $request)
