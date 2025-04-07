@@ -92,6 +92,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/update', [UserController::class, 'updateRep']);
         Route::post('/lists', [UserController::class, 'getRepsList']);
         Route::post('/destroy', [UserController::class, 'destroyRep']);
+        Route::get('/get-rep-user', [UserController::class, 'getUserForRep']);
     });
 
 

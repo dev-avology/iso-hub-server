@@ -434,17 +434,15 @@ class UserController extends Controller
             $query->where('id', $request->id);
         }
 
-         // Fetch users with the role "rep"
-        $user_role = User::where('role_id',5)->get(); 
-
         $reps = $query->get();
 
-        $response = [
-            'data' => $reps,
-            'user_role' => $user_role
-        ];
+        return ApiResponseService::success('Reps lists fetched successfully', $reps);
+    }
 
-        return ApiResponseService::success('Reps lists fetched successfully', $response);
+    public function getUserForRep(){
+        // Fetch users with the role "rep"
+        $user_role = User::where('role_id',5)->get(); 
+        return ApiResponseService::success('User fetched successfully', $user_role);
     }
 
     public function sendEmailToProspect(Request $request)
