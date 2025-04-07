@@ -87,6 +87,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/download/{id}', [FileController::class, 'downloadFile']);
     });
 
+    Route::group(['prefix' => 'reps'], function () {
+        Route::post('/create', [UserController::class, 'createRep']);
+        Route::put('/update', [UserController::class, 'updateRep']);
+        Route::post('/lists', [UserController::class, 'getRepsList']);
+        Route::post('/destroy', [UserController::class, 'destroyRep']);
+    });
+
+
     Route::post('jotform/lists', [JotFromController::class, 'getFormsList']);
     Route::get('jotform/{id}', [JotFromController::class, 'getFromDetails']);
     Route::post('duplicate-form-send-mail', [JotFromController::class, 'sendFormDuplicateMail']);
