@@ -421,7 +421,7 @@ class UserController extends Controller
 
     public function getRepsList(Request $request)
     {
-        $permission = 'reps';
+        $permission = 'reps.view';
         $userPermission = $this->DashboardService->checkPermission($permission);
 
         if (!empty($userPermission)) {
