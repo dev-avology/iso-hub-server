@@ -103,6 +103,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/create-item', [MarketingController::class, 'createItem']);
         Route::post('/update-item', [MarketingController::class, 'updateItem']);
         Route::get('/lists', [MarketingController::class, 'getCatWithItem']);
+        Route::get('/get-item-details/{id}', [MarketingController::class, 'getItemDetails']);
         // Route::put('/update', [UserController::class, 'updateRep']);
         // Route::post('/lists', [UserController::class, 'getRepsList']);
         // Route::post('/destroy', [UserController::class, 'destroyRep']);
