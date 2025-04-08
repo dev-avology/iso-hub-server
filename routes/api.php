@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\GoogleDriveController;
 use App\Http\Controllers\Api\JotFromController;
 use App\Http\Controllers\Api\NewGoogleDriveController;
 use App\Http\Controllers\Api\DropboxController;
+use App\Http\Controllers\Api\OneDriveController;
 
 /*
 |--------------------------------------------------------------------------
@@ -104,12 +105,18 @@ Route::middleware('auth:sanctum')->group(function () {
     // Google Drive Routes
     Route::get('/google/redirect', [NewGoogleDriveController::class, 'redirectToGoogle']);
     Route::post('/google/callback', [NewGoogleDriveController::class, 'handleCallback']);
+    Route::get('/google/drive/list', [NewGoogleDriveController::class, 'listFiles']);
     Route::post('/google/disconnect', [NewGoogleDriveController::class, 'disconnect']);
-    Route::get('google/drive/list', [NewGoogleDriveController::class, 'listFiles']);
 
     // Dropbox routes
     Route::get('/dropbox/redirect', [DropboxController::class, 'redirectToDropbox']);
     Route::post('/dropbox/callback', [DropboxController::class, 'handleCallback']);
-    Route::post('/dropbox/disconnect', [DropboxController::class, 'disconnect']);
     Route::get('/dropbox/list', [DropboxController::class, 'listFiles']);
+    Route::post('/dropbox/disconnect', [DropboxController::class, 'disconnect']);
+
+    // OneDrive routes
+    Route::get('/onedrive/redirect', [OneDriveController::class, 'redirectToOneDrive']);
+    Route::post('/onedrive/callback', [OneDriveController::class, 'handleCallback']);
+    Route::get('/onedrive/list', [OneDriveController::class, 'listFiles']);
+    Route::post('/onedrive/disconnect', [OneDriveController::class, 'disconnect']);
 });

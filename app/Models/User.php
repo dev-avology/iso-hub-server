@@ -31,6 +31,8 @@ class User extends Authenticatable
         'unique_string',
         'google_access_token',
         'dropbox_access_token',
+        'onedrive_access_token',
+        'onedrive_refresh_token',
     ];
 
     /**

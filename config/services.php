@@ -43,4 +43,10 @@ return [
         'redirect_uri' => env('DROPBOX_REDIRECT_URI'),
     ],
 
+    'onedrive' => [
+        'client_id' => env('ONEDRIVE_CLIENT_ID'),
+        'client_secret' => env('ONEDRIVE_CLIENT_SECRET'),
+        'redirect_uri' => env('ONEDRIVE_REDIRECT_URI'),
+    ],
+
 ];
