@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\GoogleDriveController;
 use App\Http\Controllers\Api\JotFromController;
 use App\Http\Controllers\Api\NewGoogleDriveController;
 use App\Http\Controllers\Api\DropboxController;
+use App\Http\Controllers\Api\MarketingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -94,6 +95,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/destroy', [UserController::class, 'destroyRep']);
         Route::get('/get-rep-user', [UserController::class, 'getUserForRep']);
         Route::post('/get-rep-list', [UserController::class, 'getRepsListUsingUserId']);
+        
+    });
+
+    Route::group(['prefix' => 'marketing'], function () {
+        Route::post('/create-category', [MarketingController::class, 'createCategory']);
+        Route::post('/create-item', [MarketingController::class, 'createItem']);
+        Route::post('/update-item', [MarketingController::class, 'updateItem']);
+        Route::get('/lists', [MarketingController::class, 'getCatWithItem']);
+        // Route::put('/update', [UserController::class, 'updateRep']);
+        // Route::post('/lists', [UserController::class, 'getRepsList']);
+        // Route::post('/destroy', [UserController::class, 'destroyRep']);
+        // Route::get('/get-rep-user', [UserController::class, 'getUserForRep']);
+        // Route::post('/get-rep-list', [UserController::class, 'getRepsListUsingUserId']);
         
     });
 
