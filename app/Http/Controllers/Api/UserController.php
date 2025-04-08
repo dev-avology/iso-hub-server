@@ -439,6 +439,26 @@ class UserController extends Controller
         return ApiResponseService::success('Reps lists fetched successfully', $reps);
     }
 
+    public function getRepsListUsingUserId(Request $request)
+    {
+        $permission = 'reps.view';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
+        $query = Rep::query();
+
+        if ($request->user_id) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        $reps = $query->get();
+
+        return ApiResponseService::success('Reps lists fetched successfully', $reps);
+    }
+
     public function getUserForRep(){
         // Fetch users with the role "rep"
         $user_role = User::where('role_id',5)->get(); 
