@@ -42,6 +42,7 @@ class MarketingController extends Controller
             'category_id'       => 'required|exists:marketing_categories,id',
             'items'             => 'required|array|min:1',
             'items.*.title'     => 'required|string|max:255',
+            'items.*.description'     => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -57,6 +58,7 @@ class MarketingController extends Controller
             $createdItems[] = MarketingItems::create([
                 'category_id' => $categoryId,
                 'title'       => $item['title'] ?? null,
+                'description'       => $item['description'] ?? null,
             ]);
         }
         return ApiResponseService::success('Category items created successfully', $createdItems);
@@ -89,6 +91,7 @@ class MarketingController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title'     => 'required',
+            'description' => 'required',
             'id'        => 'required|exists:marketing_items,id',
         ]);
 
@@ -107,30 +110,47 @@ class MarketingController extends Controller
 
         $category_item->update([
             'title' => $request->title,
+            'description' => $request->description,
         ]);
 
         return ApiResponseService::success('Items updated successfully', $category_item);
     }
 
-    public function getCatWithItem(){
+    public function getCatWithItem()
+    {
         $cat = MarketingCat::with('items')->get();
         return ApiResponseService::success('cat fetched successfully', $cat);
     }
 
-    public function getItemDetails($id){
-       $items = MarketingItems::where('id',$id)->first();
-       return ApiResponseService::success('Category item fetched successfully', $items);
+    public function getItemDetails($id)
+    {
+        $items = MarketingItems::where('id', $id)->first();
+        return ApiResponseService::success('Category item fetched successfully', $items);
     }
 
-    public function removeItem($id){
+    public function removeItem($id)
+    {
         $item = MarketingItems::find($id);
         $item->delete();
         return ApiResponseService::success('Item deleted successfully', []);
     }
 
-    public function removeCategory($id){
-        $item = MarketingCat::find($id);
-        $item->delete();
-        return ApiResponseService::success('Category deleted successfully', []);
+    public function removeCategory($id)
+    {
+        $category = MarketingCat::with('items')->find($id);
+
+        if (!$category) {
+            return ApiResponseService::error('Category not found', 404);
+        }
+
+        // Delete all related items first
+        foreach ($category->items as $item) {
+            $item->delete();
+        }
+
+        // Then delete the category
+        $category->delete();
+
+        return ApiResponseService::success('Category and its items deleted successfully', []);
     }
 }
