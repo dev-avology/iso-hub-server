@@ -113,4 +113,9 @@ class MarketingController extends Controller
         $cat = MarketingCat::with('items')->get();
         return ApiResponseService::success('cat fetched successfully', $cat);
     }
+
+    public function getItemDetails($id){
+       $items = MarketingItems::where('id',$id)->first();
+       return ApiResponseService::success('Category item fetched successfully', $items);
+    }
 }
