@@ -93,7 +93,10 @@ class MarketingController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ApiResponseService::error('Validation error', $validator->errors(), 422);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
         }
 
         $category_item = MarketingItems::find($request->id);
