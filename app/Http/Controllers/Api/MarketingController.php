@@ -121,4 +121,16 @@ class MarketingController extends Controller
        $items = MarketingItems::where('id',$id)->first();
        return ApiResponseService::success('Category item fetched successfully', $items);
     }
+
+    public function removeItem($id){
+        $item = MarketingItems::find($id);
+        $item->delete();
+        return ApiResponseService::success('Item deleted successfully', []);
+    }
+
+    public function removeCategory($id){
+        $item = MarketingCat::find($id);
+        $item->delete();
+        return ApiResponseService::success('Category deleted successfully', []);
+    }
 }
