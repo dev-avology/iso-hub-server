@@ -88,28 +88,28 @@ class MarketingController extends Controller
         return ApiResponseService::success('Category items created successfully', $createdItems);
     }
 
-    // public function updateCategory(Request $request, $id)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'name' => 'required|string|max:255',
-    //     ]);
+    public function updateCategory(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+        ]);
 
-    //     if ($validator->fails()) {
-    //         return ApiResponseService::error('Validation error', $validator->errors(), 422);
-    //     }
+        if ($validator->fails()) {
+            return ApiResponseService::error('Validation error', $validator->errors(), 422);
+        }
 
-    //     $category = MarketingCat::find($id);
+        $category = MarketingCat::find($request->id);
 
-    //     if (!$category) {
-    //         return ApiResponseService::error('Category not found', [], 404);
-    //     }
+        if (!$category) {
+            return ApiResponseService::error('Category not found', [], 404);
+        }
 
-    //     $category->update([
-    //         'name' => $request->name,
-    //     ]);
+        $category->update([
+            'name' => $request->name,
+        ]);
 
-    //     return ApiResponseService::success('Category updated successfully', $category);
-    // }
+        return ApiResponseService::success('Category updated successfully', $category);
+    }
 
     public function updateItem(Request $request)
     {
@@ -165,6 +165,20 @@ class MarketingController extends Controller
         $cat = $query->with('items')->orderBy('created_at', 'desc')->get();
 
         return ApiResponseService::success('Category fetched successfully', $cat);
+    }
+
+    public function getCatDetails($id)
+    {
+        $permission = 'marketing.view';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
+        $cat = MarketingCat::where('id',$id)->first();
+
+        return ApiResponseService::success('Category details fetched successfully', $cat);
     }
 
 
