@@ -156,23 +156,6 @@ class MarketingController extends Controller
             return $userPermission;
         }
 
-        if(Auth::user()->role_id  == '5'){
-            $validator = Validator::make($request->all(), [
-                'user_id' => 'required|exists:users,id',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors(),
-                ], 422);
-            }
-
-            if(Auth::user()->id != $request->user_id){
-                return ApiResponseService::error('Data cant fetch, Wrong user id!', 400);  
-            }
-        }
-
         $query = MarketingCat::query();
 
         if ($request->filled('user_id')) {
@@ -220,7 +203,7 @@ class MarketingController extends Controller
         if (!empty($userPermission)) {
             return $userPermission;
         }
-        
+
         $category = MarketingCat::with('items')->find($id);
 
         if (!$category) {
