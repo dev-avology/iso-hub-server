@@ -162,7 +162,7 @@ class MarketingController extends Controller
             $query->where('user_id', $request->user_id);
         }
 
-        $cat = $query->with('items')->get();
+        $cat = $query->with('items')->orderBy('created_at', 'desc')->get();
 
         return ApiResponseService::success('Category fetched successfully', $cat);
     }

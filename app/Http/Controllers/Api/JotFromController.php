@@ -140,9 +140,14 @@ class JotFromController extends Controller
 
         $query = JotForm::query();
 
-        if ($request->id) {
-            $query->where('id', $request->id);
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
         }
+
+        // if ($request->id) {
+        //     $query->where('id', $request->id);
+        // }
+
         $jotforms = $query->orderBy('created_at', 'desc')->get();
         return ApiResponseService::success('Jotfrom lists fetched successfully', $jotforms);
     }
