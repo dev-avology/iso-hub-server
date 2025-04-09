@@ -85,7 +85,6 @@ class JotFromController extends Controller
         try {
             // Decrypt and decode the data from the URL
             $decryptedData = json_decode(decrypt(urldecode($string)), true);
-            dd($decryptedData);
 
             // Check if the decrypted data is valid
             if (!is_array($decryptedData) || !isset($decryptedData['user_id'])) {
