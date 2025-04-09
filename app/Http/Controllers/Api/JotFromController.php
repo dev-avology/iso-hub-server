@@ -243,7 +243,7 @@ class JotFromController extends Controller
     }
 
     public function generateFormToken(Request $request){
-        $user_id = $request->user_id;
+        $user_id = (string)$request->user_id;
         $encryptedData = encrypt(json_encode(['user_id' => $user_id, 'secret' => 'jotform_URD_!@#9823_secret$%DEC8901']));
         return ApiResponseService::success('Jotfrom token fetched successfully', $encryptedData);
     }
