@@ -8,15 +8,31 @@ use Illuminate\Support\Facades\Validator;
 use App\Services\ApiResponseService; // Import API response service
 use App\Models\MarketingCat;
 use App\Models\MarketingItems;
-
+use App\Services\DashboardService;
+use Illuminate\Support\Facades\Auth;
 
 class MarketingController extends Controller
 {
+    protected $DashboardService;
+
+    public function __construct(DashboardService $DashboardService)
+    {
+        $this->DashboardService = $DashboardService;
+    }
+
     // Create a category
     public function createCategory(Request $request)
     {
+        $permission = 'marketing';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
+            'user_id' => 'required|exists:users,id',
         ]);
 
         if ($validator->fails()) {
@@ -28,6 +44,7 @@ class MarketingController extends Controller
 
         $category = MarketingCat::create([
             'name' => $request->name,
+            'user_id' => $request->user_id
         ]);
         return ApiResponseService::success('Category created successfully', $category);
     }
@@ -35,6 +52,13 @@ class MarketingController extends Controller
     // Create an item
     public function createItem(Request $request)
     {
+        $permission = 'marketing';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $categoryId = $request->category_id;
         $items = $request->items;
 
@@ -89,6 +113,13 @@ class MarketingController extends Controller
 
     public function updateItem(Request $request)
     {
+        $permission = 'marketing';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $validator = Validator::make($request->all(), [
             'title'     => 'required',
             'description' => 'required',
@@ -116,20 +147,66 @@ class MarketingController extends Controller
         return ApiResponseService::success('Items updated successfully', $category_item);
     }
 
-    public function getCatWithItem()
+    public function getCatWithItem(Request $request)
     {
-        $cat = MarketingCat::with('items')->get();
-        return ApiResponseService::success('cat fetched successfully', $cat);
+        $permission = 'marketing.view';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
+        if(Auth::user()->role_id  == '5'){
+            $validator = Validator::make($request->all(), [
+                'user_id' => 'required|exists:users,id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
+
+            if(Auth::user()->id != $request->user_id){
+                return ApiResponseService::error('Data cant fetch, Wrong user id!', 400);  
+            }
+        }
+
+        $query = MarketingCat::query();
+
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        $cat = $query->with('items')->get();
+
+        return ApiResponseService::success('Category fetched successfully', $cat);
     }
+
 
     public function getItemDetails($id)
     {
+        $permission = 'marketing.view';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $items = MarketingItems::where('id', $id)->first();
         return ApiResponseService::success('Category item fetched successfully', $items);
     }
 
     public function removeItem($id)
     {
+        $permission = 'marketing.view';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
         $item = MarketingItems::find($id);
         $item->delete();
         return ApiResponseService::success('Item deleted successfully', []);
@@ -137,6 +214,13 @@ class MarketingController extends Controller
 
     public function removeCategory($id)
     {
+        $permission = 'marketing.view';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+        
         $category = MarketingCat::with('items')->find($id);
 
         if (!$category) {

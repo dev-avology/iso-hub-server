@@ -11,7 +11,8 @@ class MarketingCat extends Model
     protected $table = 'marketing_categories';
     protected $fillable = [
         'name',
-        'slug'
+        'slug',
+        'user_id'
     ];
     public function items()
     {
