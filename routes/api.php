@@ -103,7 +103,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/create-category', [MarketingController::class, 'createCategory']);
         Route::post('/create-item', [MarketingController::class, 'createItem']);
         Route::post('/update-item', [MarketingController::class, 'updateItem']);
-        Route::get('/lists', [MarketingController::class, 'getCatWithItem']);
+        Route::post('/lists', [MarketingController::class, 'getCatWithItem']);
         Route::get('/get-item-details/{id}', [MarketingController::class, 'getItemDetails']);
         Route::get('/remove-item/{id}', [MarketingController::class, 'removeItem']);
         Route::get('/remove-category/{id}', [MarketingController::class, 'removeCategory']);
