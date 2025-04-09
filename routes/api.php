@@ -107,6 +107,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/get-item-details/{id}', [MarketingController::class, 'getItemDetails']);
         Route::get('/remove-item/{id}', [MarketingController::class, 'removeItem']);
         Route::get('/remove-category/{id}', [MarketingController::class, 'removeCategory']);
+        Route::post('/update-category', [MarketingController::class, 'updateCategory']);
+        Route::get('/get-category-details/{id}', [MarketingController::class, 'getCatDetails']);
     });
 
 
