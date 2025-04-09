@@ -107,29 +107,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/get-item-details/{id}', [MarketingController::class, 'getItemDetails']);
         Route::get('/remove-item/{id}', [MarketingController::class, 'removeItem']);
         Route::get('/remove-category/{id}', [MarketingController::class, 'removeCategory']);
-        // Route::put('/update', [UserController::class, 'updateRep']);
-        // Route::post('/lists', [UserController::class, 'getRepsList']);
-        // Route::post('/destroy', [UserController::class, 'destroyRep']);
-        // Route::get('/get-rep-user', [UserController::class, 'getUserForRep']);
-        // Route::post('/get-rep-list', [UserController::class, 'getRepsListUsingUserId']);
-        
     });
 
 
     Route::post('jotform/lists', [JotFromController::class, 'getFormsList']);
     Route::get('jotform/{id}', [JotFromController::class, 'getFromDetails']);
     Route::post('duplicate-form-send-mail', [JotFromController::class, 'sendFormDuplicateMail']);
+    Route::get('destroy-jotform/{id}', [JotFromController::class, 'destroyJotForm']);
     
-    
-    // Route::group(['prefix' => 'google'], function () {
-        //     // Get Google Auth URL
-        //     // Route::get('/auth-url', [GoogleDriveController::class, 'getAuthUrl']);
-        //     // // Handle Google Callback
-        //     // Route::get('/callback', [GoogleDriveController::class, 'handleCallback']);
-        //     // // List Google Drive Files
-        //     // Route::get('/files', [GoogleDriveController::class, 'listFiles']);
-        
-        // });
 
     // Google Drive Routes
     Route::get('/google/redirect', [NewGoogleDriveController::class, 'redirectToGoogle']);

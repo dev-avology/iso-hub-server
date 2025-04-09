@@ -225,4 +225,20 @@ class JotFromController extends Controller
 
         return ApiResponseService::success('Email sent successfully', []);
     }
+
+    public function destroyJotForm($id){
+        $permission = 'jotform.view';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
+        $jotform = JotForm::find($id);
+        if (!$jotform) {
+            return ApiResponseService::error('Jotform not found', 404);
+        }
+        $jotform->delete();
+        return ApiResponseService::success('Jotform deleted successfully');
+    }
 }
