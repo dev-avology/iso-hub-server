@@ -85,7 +85,7 @@ class JotFromController extends Controller
         try {
             // Decrypt and decode the data from the URL
             $decryptedData = json_decode(decrypt(urldecode($string)), true);
-            // dd($decryptedData);
+            dd($decryptedData);
 
             // Check if the decrypted data is valid
             if (!is_array($decryptedData) || !isset($decryptedData['user_id'])) {
@@ -240,5 +240,11 @@ class JotFromController extends Controller
         }
         $jotform->delete();
         return ApiResponseService::success('Jotform deleted successfully');
+    }
+
+    public function generateFormToken(Request $request){
+        $user_id = $request->user_id;
+        $encryptedData = encrypt(json_encode(['user_id' => $user_id, 'secret' => 'jotform_URD_!@#9823_secret$%DEC8901']));
+        return ApiResponseService::success('Jotfrom fetched successfully', $encryptedData);
     }
 }
