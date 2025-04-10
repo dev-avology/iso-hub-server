@@ -251,7 +251,7 @@ class JotFromController extends Controller
 
     public function getChatHash(Request $request)
     {
-        $userId = $request->query('user_id');
+        $userId = $request->user_id;
         $secret = env('CHATBASE_SECRET');
 
         if (!$userId || !$secret) {
@@ -259,6 +259,6 @@ class JotFromController extends Controller
         }
 
         $hash = hash_hmac('sha256', $userId, $secret);
-        return ApiResponseService::success('Jotfrom token fetched successfully', $hash);
+        return ApiResponseService::success('Token fetched successfully', $hash);
     }
 }
