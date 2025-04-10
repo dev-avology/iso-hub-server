@@ -252,7 +252,7 @@ class JotFromController extends Controller
     public function getChatHash(Request $request)
     {
         $userId = $request->query('user_id');
-        $secret = config('services.chatbase.secret');
+        $secret = env('CHATBASE_SECRET');
 
         if (!$userId || !$secret) {
             return response()->json(['error' => 'Missing data'], 400);
