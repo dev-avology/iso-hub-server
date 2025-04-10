@@ -92,7 +92,7 @@ class JotFromController extends Controller
             }
 
             // Check if secret verification is required
-            if(!isset($decryptedData['is_duplicate'])){
+            if (!isset($decryptedData['is_duplicate'])) {
                 if (!isset($decryptedData['secret']) || $decryptedData['secret'] !== 'jotform_URD_!@#9823_secret$%DEC8901') {
                     return ApiResponseService::error('Invalid encrypted data', 400);
                 }
@@ -165,7 +165,7 @@ class JotFromController extends Controller
         if ($id) {
             $query->where('id', $id);
         }
-        $jotforms = $query->orderBy('created_at','desc')->get();
+        $jotforms = $query->orderBy('created_at', 'desc')->get();
         return ApiResponseService::success('Jotfrom fetched successfully', $jotforms);
     }
 
@@ -201,7 +201,7 @@ class JotFromController extends Controller
         }
 
         $userId = Auth::id();
-        if($request->user_id != $userId){
+        if ($request->user_id != $userId) {
             return ApiResponseService::error('Unauthorized user.', 401);
         }
 
@@ -225,7 +225,8 @@ class JotFromController extends Controller
         return ApiResponseService::success('Email sent successfully', []);
     }
 
-    public function destroyJotForm($id){
+    public function destroyJotForm($id)
+    {
         $permission = 'jotform.view';
         $userPermission = $this->DashboardService->checkPermission($permission);
 
@@ -241,9 +242,23 @@ class JotFromController extends Controller
         return ApiResponseService::success('Jotform deleted successfully');
     }
 
-    public function generateFormToken(Request $request){
+    public function generateFormToken(Request $request)
+    {
         $user_id = (string)$request->user_id;
         $encryptedData = encrypt(json_encode(['user_id' => $user_id, 'secret' => 'jotform_URD_!@#9823_secret$%DEC8901']));
         return ApiResponseService::success('Jotfrom token fetched successfully', $encryptedData);
+    }
+
+    public function getChatHash(Request $request)
+    {
+        $userId = $request->query('user_id');
+        $secret = config('services.chatbase.secret');
+
+        if (!$userId || !$secret) {
+            return response()->json(['error' => 'Missing data'], 400);
+        }
+
+        $hash = hash_hmac('sha256', $userId, $secret);
+        return ApiResponseService::success('Jotfrom token fetched successfully', $hash);
     }
 }

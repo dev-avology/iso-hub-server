@@ -117,6 +117,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('duplicate-form-send-mail', [JotFromController::class, 'sendFormDuplicateMail']);
     Route::get('destroy-jotform/{id}', [JotFromController::class, 'destroyJotForm']);
     Route::post('generate-form-token', [JotFromController::class, 'generateFormToken']);
+    Route::get('chat-hash', [JotFromController::class, 'getChatHash']);
+
 
     // Google Drive Routes
     Route::get('/google/redirect', [NewGoogleDriveController::class, 'redirectToGoogle']);
