@@ -251,14 +251,14 @@ class JotFromController extends Controller
 
     public function getChatHash(Request $request)
     {
-        $userId = $request->query('user_id');
-        $secret = config('services.chatbase.secret');
+        $userId = $request->user_id;
+        $secret = env('CHATBASE_SECRET');
 
         if (!$userId || !$secret) {
             return response()->json(['error' => 'Missing data'], 400);
         }
 
         $hash = hash_hmac('sha256', $userId, $secret);
-        return ApiResponseService::success('Jotfrom token fetched successfully', $hash);
+        return ApiResponseService::success('Token fetched successfully', $hash);
     }
 }
