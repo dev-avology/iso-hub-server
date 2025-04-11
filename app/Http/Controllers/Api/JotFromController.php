@@ -33,21 +33,72 @@ class JotFromController extends Controller
     public function createForm(Request $request)
     {
         // Use Validator for detailed error handling
+        // $validator = Validator::make($request->all(), [
+        //     // 'first_name'      => 'required|string|max:255',
+        //     // 'last_name'       => 'nullable|string|max:255',
+        //     'dba'           => 'required|string',
+        //     // 'phone'           => 'required|string|max:15',
+        //     'description'     => 'required|string',
+        //     'address2'     => 'required|string',
+        //     'city'     => 'required|string',
+        //     'state'     => 'required|string',
+        //     'pincode'     => 'required|string',
+        //     'is_same_shipping_address'     => 'required|string',
+        //     'signature_date'  => 'required|date',
+        //     'signature'       => 'required|string',
+        //     'unique_string'   => 'required|string'
+        // ]);
+
+
         $validator = Validator::make($request->all(), [
-            // 'first_name'      => 'required|string|max:255',
-            // 'last_name'       => 'nullable|string|max:255',
-            'dba'           => 'required|string',
-            // 'phone'           => 'required|string|max:15',
-            'description'     => 'required|string',
-            'address2'     => 'required|string',
-            'city'     => 'required|string',
-            'state'     => 'required|string',
-            'pincode'     => 'required|string',
-            'is_same_shipping_address'     => 'required|string',
-            'signature_date'  => 'required|date',
+            'business_dba' => 'required',
+            'business_corporate_legal_name' => 'required',
+            'business_location_address' => 'required',
+            'business_corporate_address' => 'required',
+            'business_city' => 'required',
+            'business_state' => 'required',
+            'business_zip' => 'required',
+            'business_phone_number' => 'required',
+            'business_contact_name' => 'required',
+            'business_contact_number' => 'required',
+            'business_start_date' => 'required',
+            'business_tax_id' => 'required',
+            'business_profile_business_type' => 'required|array',
+        
+            'ownership_owner_name' => 'required',
+            'ownership_title' => 'required',
+            'ownership_percent' => 'required',
+            'ownership_phone_number' => 'required',
+            'ownership_city' => 'required',
+            'ownership_state' => 'required',
+            'ownership_zip' => 'required',
+            'ownership_email' => 'required',
+            'ownership_dob' => 'required|date',
+            'ownership_social_security_number' => 'required',
+            'ownership_residential_street_address' => 'required',
+            'ownership_driver_licence_number' => 'required',
+        
+            'bank_name' => 'required',
+            'aba_routing' => 'required',
+            'doa' => 'required',
+        
+            'business_type' => 'required|array',
+        
+            'terminal' => 'required|array',
+            'processing_services' => 'required|array',
+            'terminal_type_or_model' => 'required',
+            'mobile_app' => 'required|array',
+            'mobile_app_cardreader_type_model' => 'required',
+            'pos_point_of_sale' => 'required|array',
+            'system_type_model' => 'required',
+            'number_of_stations' => 'required',
+            'pos_other_items' => 'required',
+            'virtual_terminal' => 'required|array',
             'signature'       => 'required|string',
-            'unique_string'   => 'required|string'
+            'unique_string'   => 'required|string',
+            'signature_date'  => 'required|date'
         ]);
+        
 
         // Return validation errors if any
         if ($validator->fails()) {
