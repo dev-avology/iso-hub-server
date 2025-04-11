@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('business_phone_number')->nullable()->after('business_zip');
             $table->string('business_contact_name')->nullable()->after('business_phone_number');
             $table->string('business_contact_number')->nullable()->after('business_contact_name');
-            $table->string('business_start_date')->nullable()->after('business_contact_number');
+            $table->date('business_start_date')->nullable()->after('business_contact_number');
             $table->string('business_tax_id')->nullable()->after('business_start_date');
             $table->text('business_profile_business_type')->nullable()->after('business_tax_id');
 
