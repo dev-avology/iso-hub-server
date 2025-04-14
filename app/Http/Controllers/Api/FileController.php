@@ -51,6 +51,8 @@ class FileController extends Controller
             return ApiResponseService::error('Missing encrypted data', 400);
         }
 
+        $userId = null;
+        $email_id = null;        
         try {
             // Decrypt and decode the data from the URL
             $decryptedData = json_decode(decrypt(urldecode($queryData)), true);
@@ -60,10 +62,11 @@ class FileController extends Controller
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
             return ApiResponseService::error('Invalid encrypted data', 400);
         }
-
+        
         $fileUploades = $this->FileService->uploadFiles($request, $userId, $name, $email_id);
-
+        $message = 'New document submitted by '.$name;
         if ($fileUploades) {
+            $this->FileService->notifyUser($userId,$message);
             return ApiResponseService::success('Files uploaded successfully!', $fileUploades);
         }
         return ApiResponseService::error('No file uploaded', 400);

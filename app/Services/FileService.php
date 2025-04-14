@@ -10,6 +10,9 @@ use Spatie\Permission\Models\Permission;
 use App\Models\UploadFiles;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NotifyUserMail;
+use App\Models\Notification;
 
 class FileService
 {
@@ -65,5 +68,34 @@ class FileService
         }
 
         return response()->download($filePath, basename($filePath));
+    }
+
+    public function notifyUser($user_id, $message)
+    {
+        $user = User::where('id', $user_id)->first();
+        $name = "";
+        if ($user) {
+            $name = $user->first_name;
+        }
+        $data = [
+            'name' => $name,
+            'message' => $message
+        ];
+
+        Mail::to($user->email)->send(new NotifyUserMail($data));
+
+        // Increase notify_count for the main user
+        if ($user && !in_array($user->role_id,[1,2])) {
+            $user->increment('notify_count');
+        }
+        $adminAndSuperadminIds = User::whereIn('role_id', [1, 2])->pluck('id');
+
+        User::whereIn('id', $adminAndSuperadminIds)->each(function ($adminUser) {
+            $adminUser->increment('notify_count');
+        });
+
+        $noti_data = ['user_id' => $user_id, 'message' => $message];
+        Notification::create($noti_data );
+        return true;
     }
 }

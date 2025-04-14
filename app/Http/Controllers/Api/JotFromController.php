@@ -17,17 +17,20 @@ use Illuminate\Support\Facades\Auth;
 use App\Services\JotFormService;
 use App\Mail\DuplicateFormMail;
 use App\Services\DashboardService;
+use App\Services\FileService;
 
 class JotFromController extends Controller
 {
     protected $JotFormService;
     protected $UserService;
     protected $DashboardService;
+    protected $FileService;
 
-    public function __construct(JotFormService $JotFormService, DashboardService $DashboardService)
+    public function __construct(JotFormService $JotFormService, DashboardService $DashboardService,FileService $FileService)
     {
         $this->JotFormService = $JotFormService;
         $this->DashboardService = $DashboardService;
+        $this->FileService = $FileService;
     }
 
     public function createForm(Request $request)
@@ -81,7 +84,6 @@ class JotFromController extends Controller
             'signature_date'  => 'required|date'
         ]);
 
-
         // Return validation errors if any
         if ($validator->fails()) {
             return response()->json([
@@ -96,15 +98,28 @@ class JotFromController extends Controller
             return ApiResponseService::error('Missing encrypted data', 400);
         }
         $userId = null;
+        $business_dba = null;
+        $message = null;
         try {
             // Decrypt and decode the data from the URL
             $decryptedData = json_decode(decrypt(urldecode($queryData)), true);
             $userId = $decryptedData['user_id'] ?? null;
+            $business_dba = $request->business_dba ?? null;
+            
+            if (isset($decryptedData['is_duplicate']) && ($decryptedData['is_duplicate'] == '1')) {
+                $message = 'Replicated JotForm submission ('.$business_dba.').';
+            } else {
+                $message = 'New JotForm submission ('.$business_dba.').';
+            }
+
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
             return ApiResponseService::error('Invalid encrypted data', 400);
         }
 
         $form = $this->JotFormService->create($request, $userId);
+        if($form){
+            $this->FileService->notifyUser($userId,$message);
+        }
         return ApiResponseService::success('Forms Created Successfully', $form);
     }
 
@@ -167,11 +182,6 @@ class JotFromController extends Controller
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
         }
-
-        // if ($request->id) {
-        //     $query->where('id', $request->id);
-        // }
-
         $jotforms = $query->orderBy('created_at', 'desc')->get();
         return ApiResponseService::success('Jotfrom lists fetched successfully', $jotforms);
     }
@@ -201,21 +211,6 @@ class JotFromController extends Controller
         if (!empty($userPermission)) {
             return $userPermission;
         }
-        // Use Validator for detailed error handling
-        // $validator = Validator::make($request->all(), [
-        //     'dba' => 'required',
-        //     'description' => 'required',
-        //     'address2' => 'required',
-        //     'city' => 'required',
-        //     'state' => 'required',
-        //     'is_same_shipping_address' => 'required',
-        //     'pincode' => 'required',
-        //     'user_id' => 'required',
-        //     // 'signature' => 'required',
-        //     // 'signature_date' => 'required',
-        //     'email' => 'required|email',
-        //     'is_duplicate' => 'required',
-        // ]);
 
         $validator = Validator::make($request->all(), [
             'business_dba' => 'required',
@@ -277,21 +272,6 @@ class JotFromController extends Controller
         if ($request->user_id != $userId) {
             return ApiResponseService::error('Unauthorized user.', 401);
         }
-
-        // $data = [
-        //     'dba' => $request->dba,
-        //     'description' => $request->description,
-        //     'address2' => $request->address2,
-        //     'city' => $request->city,
-        //     'state' => $request->state,
-        //     'is_same_shipping_address' => $request->is_same_shipping_address,
-        //     'pincode' => $request->pincode,
-        //     'user_id' => $request->user_id,
-        //     'signature' => $request->signature,
-        //     'signature_date' => $request->signature_date,
-        //     'email' => $request->email,
-        //     'is_duplicate' => $request->is_duplicate,
-        // ];
 
         $data = [
             'business_dba' => $request->business_dba,

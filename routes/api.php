@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\NewGoogleDriveController;
 use App\Http\Controllers\Api\DropboxController;
 use App\Http\Controllers\Api\OneDriveController;
 use App\Http\Controllers\Api\MarketingController;
+use App\Http\Controllers\Api\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -110,6 +111,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/update-category', [MarketingController::class, 'updateCategory']);
         Route::get('/get-category-details/{id}', [MarketingController::class, 'getCatDetails']);
     });
+
+    Route::group(['prefix' => 'notification'], function () {
+        Route::get('/count/{user_id}', [NotificationController::class, 'getUserNoticationCount']);
+    });
+
 
 
     Route::post('jotform/lists', [JotFromController::class, 'getFormsList']);
