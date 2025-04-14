@@ -110,7 +110,6 @@ class JotFromController extends Controller
 
     public function jotFormcheckUniqueString($string)
     {
-        // Check if the string is provided
         if (!$string) {
             return ApiResponseService::error('Missing encrypted data', 400);
         }
@@ -142,16 +141,9 @@ class JotFromController extends Controller
             $data = [];
 
             if (isset($decryptedData['is_duplicate'])) {
-                // $data['user_id'] = $decryptedData['user_id'];
-                $data['address2'] = $decryptedData['address2'];
-                $data['city'] = $decryptedData['city'];
-                $data['dba'] = $decryptedData['dba'];
-                $data['description'] = $decryptedData['description'];
-                // $data['email'] = $decryptedData['email'];
-                $data['is_same_shipping_address'] = $decryptedData['is_same_shipping_address'];
-                $data['pincode'] = $decryptedData['pincode'];
-                $data['state'] = $decryptedData['state'];
-                $data['is_duplicate'] = $decryptedData['is_duplicate'];
+                foreach ($decryptedData as $key => $value) {
+                    $data[$key] = $value;
+                }
             }
             // Return success with user data if everything is valid
             return ApiResponseService::success('Data verified successfully', $data);
