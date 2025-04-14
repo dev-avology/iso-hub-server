@@ -139,6 +139,7 @@ class JotFromController extends Controller
             }
 
             $data = [];
+            \Log::info($decryptedData,'decryptedData');
 
             if (isset($decryptedData['is_duplicate'])) {
                 foreach ($decryptedData as $key => $value) {
