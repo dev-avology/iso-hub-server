@@ -46,7 +46,7 @@ class JotFromController extends Controller
             'business_start_date' => 'required|date',
             'business_tax_id' => 'required',
             'business_profile_business_type' => 'nullable|array',
-        
+
             'ownership_owner_name' => 'required',
             'ownership_title' => 'required',
             'ownership_percent' => 'required',
@@ -59,13 +59,13 @@ class JotFromController extends Controller
             'ownership_social_security_number' => 'required',
             'ownership_residential_street_address' => 'required',
             'ownership_driver_licence_number' => 'required',
-        
+
             'bank_name' => 'required',
             'aba_routing' => 'required',
             'doa' => 'required',
-        
+
             'business_type' => 'nullable|array',
-        
+
             'terminal' => 'nullable|array',
             'processing_services' => 'nullable|array',
             'terminal_type_or_model' => 'required',
@@ -80,7 +80,7 @@ class JotFromController extends Controller
             'unique_string'   => 'required|string',
             'signature_date'  => 'required|date'
         ]);
-        
+
 
         // Return validation errors if any
         if ($validator->fails()) {
@@ -239,7 +239,7 @@ class JotFromController extends Controller
             'business_start_date' => 'required|date',
             'business_tax_id' => 'required',
             'business_profile_business_type' => 'nullable|array',
-        
+
             'ownership_owner_name' => 'required',
             'ownership_title' => 'required',
             'ownership_percent' => 'required',
@@ -252,13 +252,13 @@ class JotFromController extends Controller
             'ownership_social_security_number' => 'required',
             'ownership_residential_street_address' => 'required',
             'ownership_driver_licence_number' => 'required',
-        
+
             'bank_name' => 'required',
             'aba_routing' => 'required',
             'doa' => 'required',
-        
+
             'business_type' => 'nullable|array',
-        
+
             'terminal' => 'nullable|array',
             'processing_services' => 'nullable|array',
             'terminal_type_or_model' => 'required',
@@ -286,20 +286,71 @@ class JotFromController extends Controller
             return ApiResponseService::error('Unauthorized user.', 401);
         }
 
+        // $data = [
+        //     'dba' => $request->dba,
+        //     'description' => $request->description,
+        //     'address2' => $request->address2,
+        //     'city' => $request->city,
+        //     'state' => $request->state,
+        //     'is_same_shipping_address' => $request->is_same_shipping_address,
+        //     'pincode' => $request->pincode,
+        //     'user_id' => $request->user_id,
+        //     'signature' => $request->signature,
+        //     'signature_date' => $request->signature_date,
+        //     'email' => $request->email,
+        //     'is_duplicate' => $request->is_duplicate,
+        // ];
+
         $data = [
-            'dba' => $request->dba,
-            'description' => $request->description,
-            'address2' => $request->address2,
-            'city' => $request->city,
-            'state' => $request->state,
-            'is_same_shipping_address' => $request->is_same_shipping_address,
-            'pincode' => $request->pincode,
+            'business_dba' => $request->business_dba,
+            'business_corporate_legal_name' => $request->business_corporate_legal_name,
+            'business_location_address' => $request->business_location_address,
+            'business_corporate_address' => $request->business_corporate_address,
+            'business_city' => $request->business_city,
+            'business_state' => $request->business_state,
+            'business_zip' => $request->business_zip,
+            'business_phone_number' => $request->business_phone_number,
+            'business_contact_name' => $request->business_contact_name,
+            'business_contact_number' => $request->business_contact_number,
+            'business_start_date' => $request->business_start_date,
+            'business_tax_id' => $request->business_tax_id,
+            'business_profile_business_type' => $request->business_profile_business_type,
+
+            'ownership_owner_name' => $request->ownership_owner_name,
+            'ownership_title' => $request->ownership_title,
+            'ownership_percent' => $request->ownership_percent,
+            'ownership_phone_number' => $request->ownership_phone_number,
+            'ownership_city' => $request->ownership_city,
+            'ownership_state' => $request->ownership_state,
+            'ownership_zip' => $request->ownership_zip,
+            'ownership_email' => $request->ownership_email,
+            'ownership_dob' => $request->ownership_dob,
+            'ownership_social_security_number' => $request->ownership_social_security_number,
+            'ownership_residential_street_address' => $request->ownership_residential_street_address,
+            'ownership_driver_licence_number' => $request->ownership_driver_licence_number,
+
+            'bank_name' => $request->bank_name,
+            'aba_routing' => $request->aba_routing,
+            'doa' => $request->doa,
+
+            'business_type' => $request->business_type,
+
+            'terminal' => $request->terminal,
+            'processing_services' => $request->processing_services,
+            'terminal_type_or_model' => $request->terminal_type_or_model,
+            'mobile_app' => $request->mobile_app,
+            'mobile_app_cardreader_type_model' => $request->mobile_app_cardreader_type_model,
+            'pos_point_of_sale' => $request->pos_point_of_sale,
+            'system_type_model' => $request->system_type_model,
+            'number_of_stations' => $request->number_of_stations,
+            'pos_other_items' => $request->pos_other_items,
+            'virtual_terminal' => $request->virtual_terminal,
+
             'user_id' => $request->user_id,
-            'signature' => $request->signature,
-            'signature_date' => $request->signature_date,
             'email' => $request->email,
-            'is_duplicate' => $request->is_duplicate,
+            'is_duplicate' => '1'
         ];
+
 
         Mail::to($request->email)->send(new DuplicateFormMail($data));
 
