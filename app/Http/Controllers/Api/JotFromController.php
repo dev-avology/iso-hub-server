@@ -210,19 +210,67 @@ class JotFromController extends Controller
             return $userPermission;
         }
         // Use Validator for detailed error handling
+        // $validator = Validator::make($request->all(), [
+        //     'dba' => 'required',
+        //     'description' => 'required',
+        //     'address2' => 'required',
+        //     'city' => 'required',
+        //     'state' => 'required',
+        //     'is_same_shipping_address' => 'required',
+        //     'pincode' => 'required',
+        //     'user_id' => 'required',
+        //     // 'signature' => 'required',
+        //     // 'signature_date' => 'required',
+        //     'email' => 'required|email',
+        //     'is_duplicate' => 'required',
+        // ]);
+
         $validator = Validator::make($request->all(), [
-            'dba' => 'required',
-            'description' => 'required',
-            'address2' => 'required',
-            'city' => 'required',
-            'state' => 'required',
-            'is_same_shipping_address' => 'required',
-            'pincode' => 'required',
+            'business_dba' => 'required',
+            'business_corporate_legal_name' => 'required',
+            'business_location_address' => 'required',
+            'business_corporate_address' => 'required',
+            'business_city' => 'required',
+            'business_state' => 'required',
+            'business_zip' => 'required',
+            'business_phone_number' => 'required',
+            'business_contact_name' => 'required',
+            'business_contact_number' => 'required',
+            'business_start_date' => 'required|date',
+            'business_tax_id' => 'required',
+            'business_profile_business_type' => 'nullable|array',
+        
+            'ownership_owner_name' => 'required',
+            'ownership_title' => 'required',
+            'ownership_percent' => 'required',
+            'ownership_phone_number' => 'required',
+            'ownership_city' => 'required',
+            'ownership_state' => 'required',
+            'ownership_zip' => 'required',
+            'ownership_email' => 'required',
+            'ownership_dob' => 'required|date',
+            'ownership_social_security_number' => 'required',
+            'ownership_residential_street_address' => 'required',
+            'ownership_driver_licence_number' => 'required',
+        
+            'bank_name' => 'required',
+            'aba_routing' => 'required',
+            'doa' => 'required',
+        
+            'business_type' => 'nullable|array',
+        
+            'terminal' => 'nullable|array',
+            'processing_services' => 'nullable|array',
+            'terminal_type_or_model' => 'required',
+            'mobile_app' => 'nullable|array',
+            'mobile_app_cardreader_type_model' => 'required',
+            'pos_point_of_sale' => 'nullable|array',
+            'system_type_model' => 'required',
+            'number_of_stations' => 'required',
+            'pos_other_items' => 'required',
+            'virtual_terminal' => 'nullable|array',
             'user_id' => 'required',
-            // 'signature' => 'required',
-            // 'signature_date' => 'required',
-            'email' => 'required|email',
-            'is_duplicate' => 'required',
+            'email' => 'required'
         ]);
 
         // Return validation errors if any
