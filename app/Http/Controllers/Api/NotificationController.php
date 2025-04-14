@@ -25,4 +25,15 @@ class NotificationController extends Controller
         ];
         return response()->json($data);
     }
+
+    public function removeNotification(Request $request)
+    {
+        $user = User::find($request->user_id);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+        $user->update(['notify_count' => 0]);
+        return ApiResponseService::success('Notification count reset successfully.', []);
+    }
 }
