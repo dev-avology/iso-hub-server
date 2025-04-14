@@ -114,6 +114,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::group(['prefix' => 'notification'], function () {
         Route::get('/count/{user_id}', [NotificationController::class, 'getUserNoticationCount']);
+        Route::post('/remove-notification', [NotificationController::class, 'removeNotification']);
     });
 
 
