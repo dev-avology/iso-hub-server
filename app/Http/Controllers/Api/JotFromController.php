@@ -326,16 +326,20 @@ class JotFromController extends Controller
             'doa' => $request->doa,
 
             'business_type' => $request->business_type,
+            'business_type_other' => $request->business_type_other,
 
             'terminal' => $request->terminal,
+            'terminal_special_features' => $request->terminal_special_features ?? '',
             'processing_services' => $request->processing_services,
             'terminal_type_or_model' => $request->terminal_type_or_model,
             'mobile_app' => $request->mobile_app,
             'mobile_app_cardreader_type_model' => $request->mobile_app_cardreader_type_model,
+            'mobile_app_special_features' => $request->mobile_app_special_features ?? '',
             'pos_point_of_sale' => $request->pos_point_of_sale,
             'system_type_model' => $request->system_type_model,
             'number_of_stations' => $request->number_of_stations,
             'pos_other_items' => $request->pos_other_items,
+            'pos_special_features' => $request->pos_special_features,
             'virtual_terminal' => $request->virtual_terminal,
 
             'user_id' => $request->user_id,
