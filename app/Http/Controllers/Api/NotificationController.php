@@ -20,8 +20,8 @@ class NotificationController extends Controller
 
         $data = [
             'count' => $user->notify_count,
-            'user_notifications' => Notification::where('user_id', $user_id)->get(),
-            'admin_notifications' => Notification::all(), // You can filter if needed
+            'user_notifications' => Notification::where('user_id', $user_id)->orderBy('created_at', 'desc')->get(),
+            'admin_notifications' => Notification::orderBy('created_at', 'desc')->get(), // Corrected here
             'status' => 'success'
         ];
         return response()->json($data);
