@@ -22,6 +22,7 @@ class NotificationController extends Controller
             'count' => $user->notify_count,
             'user_notifications' => Notification::where('user_id', $user_id)->get(),
             'admin_notifications' => Notification::all(), // You can filter if needed
+            'status' => 'success'
         ];
         return response()->json($data);
     }
