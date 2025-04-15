@@ -33,6 +33,7 @@ class User extends Authenticatable
         'dropbox_access_token',
         'onedrive_access_token',
         'onedrive_refresh_token',
+        'notify_count'
     ];
 
     /**
