@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('location_id')->nullable();
             $table->text('access_token')->nullable();
             $table->text('refresh_token')->nullable();
+            $table->dateTime('expires_in')->nullable();
             $table->timestamps();
         });
     }
