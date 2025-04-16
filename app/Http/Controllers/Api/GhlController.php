@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\GhlLocation;
+use Illuminate\Support\Facades\Log;
 
 class GhlController extends Controller
 {
@@ -50,12 +51,12 @@ class GhlController extends Controller
                 return redirect()->route('ghl.credentials.form', ['locationId' => $locationId]);
             } else {
                 // Handle errors in the response
-                \Log::error('OAuth Token Exchange Failed:', $response->json());
+                Log::error('OAuth Token Exchange Failed:', $response->json());
                 return response()->json(['error' => 'Failed to exchange code for access token', 'details' => $response->json()], 400);
             }
         } catch (\Exception $e) {
             // Handle any exceptions during the request
-            \Log::error('OAuth Request Error:', ['error' => $e->getMessage()]);
+            Log::error('OAuth Request Error:', ['error' => $e->getMessage()]);
             return response()->json(['error' => 'OAuth request failed', 'details' => $e->getMessage()], 500);
         }
     }
