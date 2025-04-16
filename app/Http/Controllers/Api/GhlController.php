@@ -27,11 +27,14 @@ class GhlController extends Controller
 
         if (isset($data['access_token'])) {
 
-            $locations = Http::withToken($data['access_token'])
-                ->get('https://services.leadconnectorhq.com/v1/locations')
-                ->json();
+            $response = Http::withToken($data['access_token'])
+                ->get('https://services.leadconnectorhq.com/v1/locations');
 
-            dd($locations);
+            if (!$response->ok()) {
+                dd('API failed:', $response->status(), $response->body());
+            }
+
+            dd($response->json());
 
 
             GhlLocation::updateOrCreate(
