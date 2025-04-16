@@ -13,7 +13,8 @@ class GhlController extends Controller
     public function oauthCallback(Request $request)
     {
         $code = $request->query('code');
-
+        $locationId = $request->query('locationId');
+    
         // Step 1: Exchange code for access token (using application/x-www-form-urlencoded)
         $response = Http::asForm()->post('https://services.leadconnectorhq.com/oauth/token', [
             'client_id' => env('GHL_CLIENT_ID'),
@@ -22,29 +23,12 @@ class GhlController extends Controller
             'code' => $code,
             'redirect_uri' => route('ghl.oauth.callback'),
         ]);
-
+    
         $data = $response->json();
 
+        dd($data);
+    
         if (isset($data['access_token'])) {
-
-            // $response = Http::withToken($data['access_token'])
-            //     ->get('https://services.leadconnectorhq.com/v1/locations');
-
-            // if (!$response->ok()) {
-            //     dd('API failed:', $response->status(), $response->body());
-            // }
-
-            $response = Http::withToken($data['access_token'])
-                ->get('https://services.leadconnectorhq.com/oauth/locations');
-
-            if (!$response->ok()) {
-                dd('API failed:', $response->status(), $response->body());
-            }
-
-            $locations = $response->json();
-            dd($locations);
-
-
             GhlLocation::updateOrCreate(
                 ['location_id' => $locationId],
                 [
@@ -53,13 +37,13 @@ class GhlController extends Controller
                     'expires_in' => now()->addSeconds($data['expires_in']),
                 ]
             );
-
+    
             return redirect()->route('ghl.credentials.form', ['locationId' => $locationId]);
         }
-
+    
         return response()->json(['error' => 'Failed to exchange code for access token', 'details' => $data]);
     }
-
+    
 
     public function showCredentialsForm($locationId)
     {
