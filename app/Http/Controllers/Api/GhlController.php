@@ -30,6 +30,8 @@ class GhlController extends Controller
         ]);
     
         $data = $response->json();
+
+        dd($data);
     
         if (isset($data['access_token'])) {
             GhlLocation::updateOrCreate(
