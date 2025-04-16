@@ -49,6 +49,8 @@ Route::get('auth/google/callback', [NewGoogleDriveController::class, 'handleGoog
 //     return $request->user();
 // });
 
+Route::get('/ghl/oauth/callback', [AuthController::class, 'oauthCallback']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
