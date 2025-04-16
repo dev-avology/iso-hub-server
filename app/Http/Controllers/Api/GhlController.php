@@ -13,6 +13,7 @@ class GhlController extends Controller
     public function oauthCallback(Request $request)
     {
         $code = $request->query('code');
+        $locationId = $request->query('locationId');
 
         // Step 1: Exchange code for access token (using application/x-www-form-urlencoded)
         $response = Http::asForm()->post('https://services.leadconnectorhq.com/oauth/token', [
@@ -27,26 +28,13 @@ class GhlController extends Controller
 
         if (isset($data['access_token'])) {
 
-            // $response = Http::withToken($data['access_token'])
-            //     ->get('https://services.leadconnectorhq.com/v1/locations');
+            $locationsResponse = Http::withToken($data['access_token'])
+                ->get('https://services.leadconnectorhq.com/v1/locations');
 
-            // if (!$response->ok()) {
-            //     dd('API failed:', $response->status(), $response->body());
-            // }
-
-            $response = Http::withToken($data['access_token'])
-                ->get('https://services.leadconnectorhq.com/oauth/locations');
-
-            if (!$response->ok()) {
-                dd('API failed:', $response->status(), $response->body());
-            }
-
-            $locations = $response->json();
-            dd($locations);
-
+            $locations = $locationsResponse->json();
 
             GhlLocation::updateOrCreate(
-                ['location_id' => $locationId],
+                ['location_id' => $locations],
                 [
                     'access_token' => $data['access_token'],
                     'refresh_token' => $data['refresh_token'],
