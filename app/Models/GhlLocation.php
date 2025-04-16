@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class GhlLocation extends Model
 {
     use HasFactory;
-    protected $table = 'ghl_location';
+    protected $table = 'tokens';
     protected $fillable = [
         'location_id',
         'access_token',
