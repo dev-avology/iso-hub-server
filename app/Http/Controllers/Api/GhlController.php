@@ -34,10 +34,10 @@ class GhlController extends Controller
             $locations = $locationsResponse->json();
 
             GhlLocation::updateOrCreate(
-                ['location_id' => $locations],
+                ['access_token' => $data['access_token']],
                 [
                     'access_token' => $data['access_token'],
-                    'refresh_token' => $data['refresh_token'],
+                    'refresh_token' => $data,
                     'expires_in' => now()->addSeconds($data['expires_in']),
                 ]
             );
