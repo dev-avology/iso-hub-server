@@ -42,16 +42,16 @@ class GhlController extends Controller
                 ]
             );
 
-            return redirect()->route('ghl.credentials.form', ['locationId' => $locationId]);
+            return redirect()->route('ghl.credentials.form');
         }
 
         return response()->json(['error' => 'Failed to exchange code for access token', 'details' => $data]);
     }
 
 
-    public function showCredentialsForm($locationId)
+    public function showCredentialsForm()
     {
         // Show a form or dashboard for the user to configure the location settings
-        return view('ghl-form', compact('locationId'));
+        return view('ghl-form');
     }
 }

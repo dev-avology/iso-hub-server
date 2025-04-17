@@ -55,7 +55,7 @@ Route::get('auth/google/callback', [NewGoogleDriveController::class, 'handleGoog
 Route::get('/integrations/oauth/callback', [GhlController::class, 'oauthCallback'])->name('ghl.oauth.callback');
 
 // Define a route to display a credentials form for the specific location
-Route::get('/integrations/location/{locationId}/credentials', [GhlController::class, 'showCredentialsForm'])->name('ghl.credentials.form');
+Route::get('/integrations/location/credentials', [GhlController::class, 'showCredentialsForm'])->name('ghl.credentials.form');
 // Route::post('/integrations/location/{locationId}/credentials', [AuthController::class, 'storeCredentials']);
 
 
