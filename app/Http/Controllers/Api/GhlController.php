@@ -37,7 +37,7 @@ class GhlController extends Controller
                 ['access_token' => $data['access_token']],
                 [
                     'access_token' => $data['access_token'],
-                    'refresh_token' => $data,
+                    'refresh_token' => json_encode($data),
                     'expires_in' => now()->addSeconds($data['expires_in']),
                 ]
             );
