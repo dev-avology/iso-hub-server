@@ -539,7 +539,7 @@ class UserController extends Controller
         Mail::to($emailId)->send(new ClearSignatureMail($data));
 
         $jotform = JotForm::find($request->form_id);
-        $jotform->upldate(['mail_status' => 1]);
+        $jotform->update(['mail_status' => 1]);
 
         return ApiResponseService::success('Email sent successfully');
     }
