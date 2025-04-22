@@ -69,6 +69,7 @@ class JotForm extends Model
         'virtual_terminal',
         'business_type_other',
         'personal_guarantee_required',
-        'clear_signature'
+        'clear_signature',
+        'mail_status'
     ];
 }

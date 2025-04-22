@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\Vendor;
 use App\Mail\ProspectMail;
 use App\Mail\ClearSignatureMail;
+use App\Models\JotForm;
 use App\Models\Rep;
 use Illuminate\Support\Facades\Auth;
 
@@ -536,6 +537,9 @@ class UserController extends Controller
         ];
 
         Mail::to($emailId)->send(new ClearSignatureMail($data));
+
+        $jotform = JotForm::find($request->form_id);
+        $jotform->upldate(['mail_status' => 1]);
 
         return ApiResponseService::success('Email sent successfully');
     }
