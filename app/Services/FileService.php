@@ -43,7 +43,8 @@ class FileService
             'signature' => $request->signature,
             'signature_date' => $request->signature_date,
             'personal_guarantee_required' => $personal_guarantee_required,
-            'clear_signature' => $clear_signature
+            'clear_signature' => $clear_signature,
+            'mail_status' => 2
         ];
 
        $form = JotForm::find($form_id);
