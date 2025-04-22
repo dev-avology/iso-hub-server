@@ -63,7 +63,7 @@ class FileController extends Controller
             $form_id = $decryptedData['form_id'] ?? null;
             $personal_guarantee_required = $decryptedData['personal_guarantee_required'] ?? null;
             $clear_signature = $decryptedData['clear_signature'] ?? null;
-            $email_id = $decryptedData['email_id'] ?? null;
+            $email_id = $decryptedData['email'] ?? null;
             
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
             return ApiResponseService::error('Invalid encrypted data', 400);
