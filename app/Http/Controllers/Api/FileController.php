@@ -120,7 +120,13 @@ class FileController extends Controller
             }
 
             $userId = $decryptedData['user_id'];
-            $name = $decryptedData['name'] ?? null;
+            $personal_guarantee_required = $decryptedData['personal_guarantee_required'] ?? '';
+            $clear_signature = $decryptedData['clear_signature'] ?? '';
+
+            $data = [
+               'personal_guarantee_required' => $personal_guarantee_required,
+               'clear_signature' => $clear_signature
+            ];
 
             // Check if user_id exists in the users table
             $user = User::find($userId);
@@ -130,7 +136,7 @@ class FileController extends Controller
             }
 
             // Return success with user data if everything is valid
-            return ApiResponseService::success('Data verified successfully');
+            return ApiResponseService::success('Data verified successfully',$data);
         } catch (\Exception $e) {
             // Handle decryption error or invalid string
             return ApiResponseService::error('Invalid encrypted data format', 400);
