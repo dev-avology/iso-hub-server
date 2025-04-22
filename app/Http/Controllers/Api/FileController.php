@@ -35,8 +35,8 @@ class FileController extends Controller
             'files' => 'required',
             'files.*' => 'mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,csv,txt', // Each file max 5MB
             'unique_string' => 'required',
-            'signature_date' => 'required',
-            'signature' => 'required'
+            // 'signature_date' => 'required',
+            // 'signature' => 'required'
         ]);
 
         // Return validation errors if any
