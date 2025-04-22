@@ -67,6 +67,8 @@ class JotForm extends Model
         'number_of_stations',
         'pos_other_items',
         'virtual_terminal',
-        'business_type_other'
+        'business_type_other',
+        'personal_guarantee_required',
+        'clear_signature'
     ];
 }

@@ -34,7 +34,9 @@ class FileController extends Controller
         $validator = Validator::make($request->all(), [
             'files' => 'required',
             'files.*' => 'mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,csv,txt', // Each file max 5MB
-            'unique_string' => 'required'
+            'unique_string' => 'required',
+            'signature_date' => 'required',
+            'signature' => 'required'
         ]);
 
         // Return validation errors if any
@@ -58,12 +60,16 @@ class FileController extends Controller
             $decryptedData = json_decode(decrypt(urldecode($queryData)), true);
             $userId = $decryptedData['user_id'] ?? null;
             $name = $decryptedData['name'] ?? null;
+            $form_id = $decryptedData['form_id'] ?? null;
+            $personal_guarantee_required = $decryptedData['personal_guarantee_required'] ?? null;
+            $clear_signature = $decryptedData['clear_signature'] ?? null;
             $email_id = $decryptedData['email_id'] ?? null;
+            
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
             return ApiResponseService::error('Invalid encrypted data', 400);
         }
         
-        $fileUploades = $this->FileService->uploadFiles($request, $userId, $name, $email_id);
+        $fileUploades = $this->FileService->uploadFiles($request, $userId, $name, $email_id, $form_id, $personal_guarantee_required, $clear_signature);
         $message = 'New document submitted by '.$name;
         if ($fileUploades) {
             $this->FileService->notifyUser($userId,$message);

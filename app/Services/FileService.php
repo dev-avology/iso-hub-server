@@ -12,11 +12,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NotifyUserMail;
+use App\Models\JotForm;
 use App\Models\Notification;
 
 class FileService
 {
-    public function uploadFiles($request, $user_id, $name, $email_id)
+    public function uploadFiles($request, $user_id, $name, $email_id,$form_id, $personal_guarantee_required, $clear_signature)
     {
         $paths = [];
         // Store each uploaded file
@@ -26,6 +27,7 @@ class FileService
                 $original_name = $file->getClientOriginalName();
                 $images = [
                     'user_id' => $user_id,
+                    'form_id' => $form_id,
                     'file_path' => asset('storage/' . $storedPath), // Correct path
                     'prospect_name' => $name, // Correct path
                     'file_original_name' => $original_name,
@@ -36,7 +38,17 @@ class FileService
             }
             $uploaded_files = array_map(fn($path) => asset($path), $paths);
         }
-        return $uploaded_files;
+
+        $jotform_data = [
+            'signature' => $request->signature,
+            'signature_date' => $request->signature_date,
+            'personal_guarantee_required' => $personal_guarantee_required,
+            'clear_signature' => $clear_signature
+        ];
+
+       $form = JotForm::find($form_id);
+       $form->update($jotform_data);
+       return $uploaded_files;
     }
 
     public function destroyFile($id)
