@@ -15,6 +15,7 @@ use App\Models\UploadFiles;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Vendor;
 use App\Mail\ProspectMail;
+use App\Mail\ClearSignatureMail;
 use App\Models\Rep;
 use Illuminate\Support\Facades\Auth;
 
@@ -498,5 +499,44 @@ class UserController extends Controller
         Mail::to($emailId)->send(new ProspectMail($userId, $emailId, $name));
 
         return ApiResponseService::success('Email sent successfully', $data);
+    }
+
+    public function clearSignatureSendMail(Request $request)
+    {
+        // Use Validator for detailed error handling
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|integer|exists:users,id',
+            'form_id' => 'required|integer||exists:jot_forms,id',
+            'personal_guarantee_required' => 'required',
+            'clear_signature' => 'required',
+            'email' => 'required|email',
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $userId = Auth::id();
+        if($request->user_id != $userId){
+            return ApiResponseService::error('Unauthorized user.', 401);
+        }
+
+        $emailId = $request->email;
+
+        $data = [
+            'user_id' => $userId,
+            'form_id' => $request->form_id,
+            'personal_guarantee_required' => $request->personal_guarantee_required,
+            'clear_signature' => $request->clear_signature,
+            'email' => $emailId,
+        ];
+
+        Mail::to($emailId)->send(new ClearSignatureMail($data));
+
+        return ApiResponseService::success('Email sent successfully');
     }
 }
