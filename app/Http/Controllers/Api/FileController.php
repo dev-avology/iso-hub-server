@@ -151,40 +151,6 @@ class FileController extends Controller
         }
     }
 
-
-    // public function downloadZipFile($id)
-    // {
-    //     $files = UploadFiles::where('form_id', $id)->get();
-
-    //     if ($files->isEmpty()) {
-    //         return response()->json(['error' => 'No files found'], 404);
-    //     }
-
-    //     $zip = new \ZipArchive;
-    //     $zipName = 'jotform_' . $id . '_files.zip';
-    //     $tempFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $zipName;
-
-    //     if ($zip->open($tempFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
-    //         foreach ($files as $file) {
-    //             // The $file_path is for debugging purposes, but you're actually using the filename to generate the file path.
-    //             $modifiedString = str_replace('/storage/uploads/', '', $file->file_path);
-    //             $filePath = storage_path('app/uploads/' . $modifiedString); // Correct path to the file in storage
-
-    //             // Check if the file exists
-    //             if (file_exists($filePath)) {
-    //                 $zip->addFile($filePath, basename($filePath));
-    //             } else {
-    //                 \Log::error("File not found: " . $filePath); // Log missing file path for debugging
-    //             }
-    //         }
-    //         $zip->close();
-
-    //         return response()->download($tempFile, $zipName)->deleteFileAfterSend(true);
-    //     } else {
-    //         return response()->json(['error' => 'Unable to create zip archive'], 500);
-    //     }
-    // }
-
     public function downloadZipFile($id)
     {
         $files = UploadFiles::where('form_id', $id)->get();
@@ -208,14 +174,10 @@ class FileController extends Controller
         $tempFile = $tempDirectory . DIRECTORY_SEPARATOR . $zipName;
 
         if ($zip->open($tempFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
+            
             foreach ($files as $file) {
-                // Remove '/storage/uploads/' from the file path to get the actual file name
                 $modifiedString = str_replace('/storage/uploads/', '', $file->file_path);
-                // Updated to point to public storage directory
-                $filePath = public_path('storage/uploads/' . ltrim($modifiedString, '/')); // Use public_path to ensure it works for public files
-
-                // Log the file path to check if it is correct
-                \Log::info('Attempting to find file at: ' . $filePath);
+                $filePath = public_path('storage/uploads/' . ltrim($modifiedString, '/'));
 
                 // Check if the file exists before adding to the ZIP
                 if (file_exists($filePath)) {
