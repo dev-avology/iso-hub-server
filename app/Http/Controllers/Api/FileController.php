@@ -72,7 +72,7 @@ class FileController extends Controller
         }
 
         $fileUploades = $this->FileService->uploadFiles($request, $userId, $name, $email_id, $form_id, $personal_guarantee_required, $clear_signature);
-        $message = 'New document submitted by ' . $name;
+        $message = 'New document submitted by ' . $email_id;
         if ($fileUploades) {
             $this->FileService->notifyUser($userId, $message);
             return ApiResponseService::success('Files uploaded successfully!', $fileUploades);
