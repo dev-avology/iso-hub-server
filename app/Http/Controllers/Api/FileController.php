@@ -89,8 +89,9 @@ class FileController extends Controller
         }
 
         $files = Auth::user()->hasRole(['admin', 'superadmin'])
-            ? UploadFiles::all()
-            : UploadFiles::where('user_id', $id)->get();
+            ? UploadFiles::orderBy('created_at', 'desc')->get()
+            : UploadFiles::where('user_id', $id)->orderBy('created_at', 'desc')->get();
+
 
         return ApiResponseService::success('Files list fetched successfully', $files);
     }
@@ -174,7 +175,7 @@ class FileController extends Controller
         $tempFile = $tempDirectory . DIRECTORY_SEPARATOR . $zipName;
 
         if ($zip->open($tempFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
-            
+
             foreach ($files as $file) {
                 $modifiedString = str_replace('/storage/uploads/', '', $file->file_path);
                 $filePath = public_path('storage/uploads/' . ltrim($modifiedString, '/'));

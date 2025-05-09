@@ -14,8 +14,6 @@ use App\Http\Controllers\Api\DropboxController;
 use App\Http\Controllers\Api\OneDriveController;
 use App\Http\Controllers\Api\MarketingController;
 use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\Api\GhlController;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -49,16 +47,6 @@ Route::get('auth/google/callback', [NewGoogleDriveController::class, 'handleGoog
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
-
-// Define the callback route where GoHighLevel will redirect after OAuth authorization
-// Route::get('/integrations/oauth/callback', [GhlController::class, 'oauthCallback']);
-Route::get('/integrations/oauth/callback', [GhlController::class, 'oauthCallback'])->name('ghl.oauth.callback');
-
-// Define a route to display a credentials form for the specific location
-Route::get('/integrations/location/credentials', [GhlController::class, 'showCredentialsForm'])->name('ghl.credentials.form');
-// Route::post('/integrations/location/{locationId}/credentials', [AuthController::class, 'storeCredentials']);
-
-
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
