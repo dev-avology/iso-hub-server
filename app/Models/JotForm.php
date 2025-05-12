@@ -38,18 +38,7 @@ class JotForm extends Model
         'business_start_date',
         'business_tax_id',
         'business_profile_business_type',
-        'ownership_owner_name',
-        'ownership_title',
-        'ownership_percent',
-        'ownership_phone_number',
-        'ownership_city',
-        'ownership_state',
-        'ownership_zip',
-        'ownership_email',
-        'ownership_dob',
-        'ownership_social_security_number',
-        'ownership_residential_street_address',
-        'ownership_driver_licence_number',
+        
         'bank_name',
         'aba_routing',
         'doa',
@@ -70,6 +59,6 @@ class JotForm extends Model
         'business_type_other',
         'personal_guarantee_required',
         'clear_signature',
-        'mail_status'
+        'mail_status',
     ];
 }
