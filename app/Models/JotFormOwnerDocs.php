@@ -30,4 +30,11 @@ class JotFormOwnerDocs extends Model
         'owner_street_address2',
         'ownership_title',
     ];
+
+    protected $hidden = [
+        "name",
+        "path",
+        'ownership_address',
+        'ownership_residential_street_address'
+    ];
 }

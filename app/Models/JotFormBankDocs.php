@@ -10,7 +10,7 @@ class JotFormBankDocs extends Model
     use HasFactory;
     protected $table = 'jot_form_bank_docs';
     protected $fillable = [
-        'jot_form_id ',
+        'jot_form_id',
         'name',
         'path'
     ];

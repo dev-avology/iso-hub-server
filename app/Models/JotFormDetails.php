@@ -39,5 +39,4 @@ class JotFormDetails extends Model
         'business_return_policy',
         'location_description'
     ];
-    
 }

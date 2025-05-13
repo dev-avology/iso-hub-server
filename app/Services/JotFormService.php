@@ -20,6 +20,7 @@ class JotFormService
 {
     public function create($request, $user_id)
     {
+        \Log::info($request->all());
         $form = JotForm::create([
             'user_id' => $user_id ?? '',
             'first_name' => $request->first_name ?? '',
@@ -70,7 +71,7 @@ class JotFormService
             'business_type_other' => $request->business_type_other ?? '',
             'personal_guarantee_required' => $request->personal_guarantee_required ?? '',
             'clear_signature' => $request->clear_signature ?? '',
-            'mail_status' => $request->mail_status ?? '',
+            'mail_status' => $request->mail_status ?? 0,
         ]);
 
         $jotFormDetails = JotFormDetails::create([
@@ -98,7 +99,7 @@ class JotFormService
             'auto_settle_time' => $request->auto_settle_time ?? '',
             'auto_settle_type' => $request->auto_settle_type ?? '',
             'add_tips_to_account' => $request->add_tips_to_account ?? '',
-            'tip_amounts' => $request->tip_amounts ?? '',
+            'tip_amounts' => json_encode($request->tip_amounts ?? []),
             'business_products_sold' => $request->business_products_sold ?? '',
             'business_return_policy' => $request->business_return_policy ?? '',
             'location_description' => $request->location_description ?? '',
@@ -106,49 +107,74 @@ class JotFormService
 
         if ($request->hasFile('bankingDocs')) {
             foreach ($request->file('bankingDocs') as $file) {
-                $fileName = time() . '_' . $file->getClientOriginalName();
-                $filePath = $file->storeAs('uploads/bank_docs', $fileName, 'public');
+                // $fileName = time() . '_' . $file->getClientOriginalName();
+                // $filePath = $file->storeAs('uploads/bank_docs', $fileName, 'public');
 
-                JotFormBankDocs::create([
-                    'jot_form_id' => $form->id,
-                    'name' => $fileName,
-                    'path' => 'storage/' . $filePath,
-                ]);
+                // JotFormBankDocs::create([
+                //     'jot_form_id' => $form->id,
+                //     'name' => $fileName,
+                //     'path' => 'storage/' . $filePath,
+                // ]);
+                $storedPath = $file->store('uploads', 'public');
+                $original_name = $file->getClientOriginalName();
+                $images = [
+                    'user_id' => $user_id,
+                    'form_id' => $form->id,
+                    'file_path' => asset('storage/' . $storedPath), // Correct path
+                    'prospect_name' => $request->business_contact_name ?? '', // Correct path
+                    'file_original_name' => $original_name,
+                    'email' =>  ''
+                ];
+                UploadFiles::create($images);
             }
         }
 
-        // Handle images from the `ownerFormData` array
-        if (isset($request->ownerFormData) && is_array($request->ownerFormData)) {
-            foreach ($request->ownerFormData as $ownerData) {
+        if (isset($request->owners) && !empty($request->owners)) {
+            foreach ($request->owners as $ownerData) {
+                $allImagePaths = [];
+
                 if (isset($ownerData['driver_license_image']) && is_array($ownerData['driver_license_image'])) {
                     foreach ($ownerData['driver_license_image'] as $image) {
-                        $imageName = time() . '_' . $image->getClientOriginalName();
-                        $imagePath = $image->storeAs('uploads/owner_docs', $imageName, 'public');
+                        // $imageName = time() . '_' . $image->getClientOriginalName();
+                        // $imagePath = $image->storeAs('uploads/owner_docs', $imageName, 'public');
+                        // $allImagePaths[] = 'storage/' . $imagePath;
 
-                        JotFormOwnerDocs::create([
-                            'jot_form_id' => $form->id, // Use the form ID if applicable
-                            'name' => $imageName,
-                            'path' => 'storage/' . $imagePath,
-                            'jot_form_id' => $form->id,
-                            'ownership_first_name' => $ownerData['ownership_first_name'] ?? '',
-                            'ownership_last_name' => $ownerData['ownership_last_name'] ?? '',
-                            'ownership_percent' => $ownerData['ownership_percent'] ?? '',
-                            'ownership_phone_number' => $ownerData['ownership_phone_number'] ?? '',
-                            'ownership_city' => $ownerData['ownership_city'] ?? '',
-                            'ownership_state' => $ownerData['ownership_state'] ?? '',
-                            'ownership_zip' => $ownerData['ownership_zip'] ?? '',
-                            'ownership_email' => $ownerData['ownership_email'] ?? '',
-                            'ownership_dob' => $ownerData['ownership_dob'] ?? '',
-                            'ownership_driver_licence_number' => $ownerData['ownership_driver_licence_number'] ?? '',
-                            'ownership_title' => $ownerData['ownership_title'] ?? '',
-                            'owner_street_address' => $ownerData['owner_street_address'] ?? '',
-                            'owner_street_address2' => $ownerData['owner_street_address2'] ?? '',
-                            'ownership_social_security_number' => $ownerData['ownership_social_security_number'] ?? '',
-                            'ownership_address' => $ownerData['ownership_address'] ?? '',
-                            'ownership_residential_street_address' => $ownerData['ownership_residential_street_address'] ?? '',
-                        ]);
+                        $storedPath = $image->store('uploads', 'public');
+                        $original_name = $image->getClientOriginalName();
+                        $images = [
+                            'user_id' => $user_id,
+                            'form_id' => $form->id,
+                            'file_path' => asset('storage/' . $storedPath), // Correct path
+                            'prospect_name' => $request->business_contact_name ?? '', // Correct path
+                            'file_original_name' => $original_name,
+                            'email' => $ownerData['ownership_email'] ?? ''
+                        ];
+                        UploadFiles::create($images);
                     }
                 }
+
+                JotFormOwnerDocs::create([
+                    'jot_form_id' => $form->id, // Use the form ID if applicable
+                    'name' => '',
+                    'path' => json_encode($allImagePaths),
+                    'jot_form_id' => $form->id,
+                    'ownership_first_name' => $ownerData['ownership_first_name'] ?? '',
+                    'ownership_last_name' => $ownerData['ownership_last_name'] ?? '',
+                    'ownership_percent' => $ownerData['ownership_percent'] ?? '',
+                    'ownership_phone_number' => $ownerData['ownership_phone_number'] ?? '',
+                    'ownership_city' => $ownerData['ownership_city'] ?? '',
+                    'ownership_state' => $ownerData['ownership_state'] ?? '',
+                    'ownership_zip' => $ownerData['ownership_zip'] ?? '',
+                    'ownership_email' => $ownerData['ownership_email'] ?? '',
+                    'ownership_dob' => $ownerData['ownership_dob'] ?? '',
+                    'ownership_driver_licence_number' => $ownerData['ownership_driver_licence_number'] ?? '',
+                    'ownership_title' => $ownerData['ownership_title'] ?? '',
+                    'owner_street_address' => $ownerData['owner_street_address'] ?? '',
+                    'owner_street_address2' => $ownerData['owner_street_address2'] ?? '',
+                    'ownership_social_security_number' => $ownerData['ownership_social_security_number'] ?? '',
+                    'ownership_address' => $ownerData['ownership_address'] ?? '',
+                    'ownership_residential_street_address' => $ownerData['ownership_residential_street_address'] ?? '',
+                ]);
             }
         }
 

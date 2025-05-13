@@ -38,7 +38,7 @@ class JotForm extends Model
         'business_start_date',
         'business_tax_id',
         'business_profile_business_type',
-        
+
         'bank_name',
         'aba_routing',
         'doa',
@@ -61,4 +61,49 @@ class JotForm extends Model
         'clear_signature',
         'mail_status',
     ];
+
+    protected $hidden = [
+        "business_corporate_legal_name",
+        "business_location_address",
+        "business_corporate_address",
+        "ownership_owner_name",
+        "ownership_title",
+        "ownership_percent",
+        "ownership_phone_number",
+        "ownership_city",
+        "ownership_state",
+        "ownership_zip",
+        "ownership_email",
+        "ownership_dob",
+        "ownership_social_security_number",
+        "ownership_residential_street_address",
+        "ownership_driver_licence_number",
+        "terminal_special_features",
+        "first_name",
+        "last_name",
+        "phone",
+        "description",
+        "dba",
+        "address2",
+        "state",
+        "city",
+        "pincode",
+        "business_phone_number",
+        "business_contact_number",
+    ];
+
+    public function get_jotform_details()
+    {
+        return $this->hasMany(JotFormDetails::class, 'jot_form_id','id');
+    }
+
+    public function get_jotform_docs()
+    {
+        return $this->hasMany(UploadFiles::class, 'form_id','id');
+    }
+
+    public function get_jotform_owner_docs()
+    {
+        return $this->hasMany(JotFormOwnerDocs::class, 'jot_form_id','id');
+    }
 }
