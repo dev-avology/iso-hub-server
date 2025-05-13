@@ -26,7 +26,7 @@ class JotFromController extends Controller
     protected $DashboardService;
     protected $FileService;
 
-    public function __construct(JotFormService $JotFormService, DashboardService $DashboardService,FileService $FileService)
+    public function __construct(JotFormService $JotFormService, DashboardService $DashboardService, FileService $FileService)
     {
         $this->JotFormService = $JotFormService;
         $this->DashboardService = $DashboardService;
@@ -35,62 +35,62 @@ class JotFromController extends Controller
 
     public function createForm(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'business_dba' => 'required',
-            'business_corporate_legal_name' => 'required',
-            'business_location_address' => 'required',
-            'business_corporate_address' => 'required',
-            'business_city' => 'required',
-            'business_state' => 'required',
-            'business_zip' => 'required',
-            'business_phone_number' => 'required',
-            'business_contact_name' => 'required',
-            'business_contact_number' => 'required',
-            'business_start_date' => 'required|date',
-            'business_tax_id' => 'required',
-            'business_profile_business_type' => 'nullable|array',
+        // $validator = Validator::make($request->all(), [
+        //     'business_dba' => 'required',
+        //     'business_corporate_legal_name' => 'required',
+        //     'business_location_address' => 'required',
+        //     'business_corporate_address' => 'required',
+        //     'business_city' => 'required',
+        //     'business_state' => 'required',
+        //     'business_zip' => 'required',
+        //     'business_phone_number' => 'required',
+        //     'business_contact_name' => 'required',
+        //     'business_contact_number' => 'required',
+        //     'business_start_date' => 'required|date',
+        //     'business_tax_id' => 'required',
+        //     'business_profile_business_type' => 'nullable|array',
 
-            'ownership_owner_name' => 'required',
-            'ownership_title' => 'required',
-            'ownership_percent' => 'required',
-            'ownership_phone_number' => 'required',
-            'ownership_city' => 'required',
-            'ownership_state' => 'required',
-            'ownership_zip' => 'required',
-            'ownership_email' => 'required',
-            'ownership_dob' => 'required|date',
-            'ownership_social_security_number' => 'required',
-            'ownership_residential_street_address' => 'required',
-            'ownership_driver_licence_number' => 'required',
+        //     'ownership_owner_name' => 'required',
+        //     'ownership_title' => 'required',
+        //     'ownership_percent' => 'required',
+        //     'ownership_phone_number' => 'required',
+        //     'ownership_city' => 'required',
+        //     'ownership_state' => 'required',
+        //     'ownership_zip' => 'required',
+        //     'ownership_email' => 'required',
+        //     'ownership_dob' => 'required|date',
+        //     'ownership_social_security_number' => 'required',
+        //     'ownership_residential_street_address' => 'required',
+        //     'ownership_driver_licence_number' => 'required',
 
-            'bank_name' => 'required',
-            'aba_routing' => 'required',
-            'doa' => 'required',
+        //     'bank_name' => 'required',
+        //     'aba_routing' => 'required',
+        //     'doa' => 'required',
 
-            'business_type' => 'nullable|array',
+        //     'business_type' => 'nullable|array',
 
-            'terminal' => 'nullable|array',
-            'processing_services' => 'nullable|array',
-            'terminal_type_or_model' => 'required',
-            'mobile_app' => 'nullable|array',
-            'mobile_app_cardreader_type_model' => 'required',
-            'pos_point_of_sale' => 'nullable|array',
-            'system_type_model' => 'required',
-            'number_of_stations' => 'required',
-            'pos_other_items' => 'required',
-            'virtual_terminal' => 'nullable|array',
-            'signature'       => 'required|string',
-            'unique_string'   => 'required|string',
-            'signature_date'  => 'required|date'
-        ]);
+        //     'terminal' => 'nullable|array',
+        //     'processing_services' => 'nullable|array',
+        //     'terminal_type_or_model' => 'required',
+        //     'mobile_app' => 'nullable|array',
+        //     'mobile_app_cardreader_type_model' => 'required',
+        //     'pos_point_of_sale' => 'nullable|array',
+        //     'system_type_model' => 'required',
+        //     'number_of_stations' => 'required',
+        //     'pos_other_items' => 'required',
+        //     'virtual_terminal' => 'nullable|array',
+        //     'signature'       => 'required|string',
+        //     'unique_string'   => 'required|string',
+        //     'signature_date'  => 'required|date'
+        // ]);
 
         // Return validation errors if any
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'message' => 'Validation failed',
+        //         'errors' => $validator->errors(),
+        //     ], 422);
+        // }
 
         $queryData = $request->unique_string;
 
@@ -105,20 +105,19 @@ class JotFromController extends Controller
             $decryptedData = json_decode(decrypt(urldecode($queryData)), true);
             $userId = $decryptedData['user_id'] ?? null;
             $business_dba = $request->business_dba ?? null;
-            
-            if (isset($decryptedData['is_duplicate']) && ($decryptedData['is_duplicate'] == '1')) {
-                $message = 'Replicated JotForm submission ('.$business_dba.').';
-            } else {
-                $message = 'New JotForm submission ('.$business_dba.').';
-            }
 
+            if (isset($decryptedData['is_duplicate']) && ($decryptedData['is_duplicate'] == '1')) {
+                $message = 'Replicated JotForm submission (' . $business_dba . ').';
+            } else {
+                $message = 'New JotForm submission (' . $business_dba . ').';
+            }
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
             return ApiResponseService::error('Invalid encrypted data', 400);
         }
 
         $form = $this->JotFormService->create($request, $userId);
-        if($form){
-            $this->FileService->notifyUser($userId,$message);
+        if ($form) {
+            $this->FileService->notifyUser($userId, $message);
         }
         return ApiResponseService::success('Forms Created Successfully', $form);
     }
@@ -154,7 +153,7 @@ class JotFromController extends Controller
             }
 
             $data = [];
-            
+
             if (isset($decryptedData['is_duplicate'])) {
                 foreach ($decryptedData as $key => $value) {
                     $data[$key] = $value;
@@ -182,26 +181,53 @@ class JotFromController extends Controller
         if ($request->filled('user_id')) {
             $query->where('user_id', $request->user_id);
         }
-        $jotforms = $query->orderBy('created_at', 'desc')->get();
+        $jotforms = $query->with(['get_jotform_details', 'get_jotform_docs', 'get_jotform_owner_docs'])->orderBy('created_at', 'desc')->get();
         return ApiResponseService::success('Jotfrom lists fetched successfully', $jotforms);
     }
 
-    public function getFromDetails($id)
+    // public function getFromDetails($id)
+    // {
+    //     $permission = 'jotform.view';
+    //     $userPermission = $this->DashboardService->checkPermission($permission);
+
+    //     if (!empty($userPermission)) {
+    //         return $userPermission;
+    //     }
+
+    //     $query = JotForm::query();
+
+    //     if ($id) {
+    //         $query->where('id', $id);
+    //     }
+    //     $jotforms = $query->orderBy('created_at', 'desc')->get();
+    //     return ApiResponseService::success('Jotfrom fetched successfully', $jotforms);
+    // }
+
+    public function getFromDetails($id = null)
     {
+        // Check if the user has the 'jotform.view' permission
         $permission = 'jotform.view';
         $userPermission = $this->DashboardService->checkPermission($permission);
 
+        // If permission check returns a response (like an error), return it immediately
         if (!empty($userPermission)) {
             return $userPermission;
         }
 
+        // Build the query
         $query = JotForm::query();
 
+        // If an ID is provided, add constraints and eager load relationships
         if ($id) {
-            $query->where('id', $id);
+            $query->with(['get_jotform_details', 'get_jotform_docs', 'get_jotform_owner_docs'])
+                ->where('id', $id);
         }
+
+        // Fetch the records
         $jotforms = $query->orderBy('created_at', 'desc')->get();
-        return ApiResponseService::success('Jotfrom fetched successfully', $jotforms);
+
+        // Return a success response
+        return ApiResponseService::success('Jotform fetched successfully', $jotforms);
     }
 
     public function sendFormDuplicateMail(Request $request)
