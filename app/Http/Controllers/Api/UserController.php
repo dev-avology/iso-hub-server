@@ -586,7 +586,7 @@ class UserController extends Controller
         if ($request->user_id) {
             $query->where('id', $request->user_id);
         }
-        $users = $query->get();
+        $users = $query->first();
         return ApiResponseService::success('User details fetched successfully', $users);
     }
 }
