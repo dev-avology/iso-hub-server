@@ -26,7 +26,7 @@ class UserController extends Controller
     protected $DashboardService;
     protected $RepService;
 
-    public function __construct(UserService $UserService, DashboardService $DashboardService,RepService $RepService)
+    public function __construct(UserService $UserService, DashboardService $DashboardService, RepService $RepService)
     {
         $this->UserService = $UserService;
         $this->DashboardService = $DashboardService;
@@ -461,9 +461,10 @@ class UserController extends Controller
         return ApiResponseService::success('Reps lists fetched successfully', $reps);
     }
 
-    public function getUserForRep(){
+    public function getUserForRep()
+    {
         // Fetch users with the role "rep"
-        $user_role = User::where('role_id',5)->get(); 
+        $user_role = User::where('role_id', 5)->get();
         return ApiResponseService::success('User fetched successfully', $user_role);
     }
 
@@ -485,7 +486,7 @@ class UserController extends Controller
         }
 
         $userId = Auth::id();
-        if($request->user_id != $userId){
+        if ($request->user_id != $userId) {
             return ApiResponseService::error('Unauthorized user.', 401);
         }
         $emailId = $request->email;
@@ -522,7 +523,7 @@ class UserController extends Controller
         }
 
         $userId = Auth::id();
-        if($request->user_id != $userId){
+        if ($request->user_id != $userId) {
             return ApiResponseService::error('Unauthorized user.', 401);
         }
 
@@ -542,5 +543,50 @@ class UserController extends Controller
         $jotform->update(['mail_status' => 1]);
 
         return ApiResponseService::success('Email sent successfully');
+    }
+
+    public function updateUserInfo(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|email|unique:users,email,' . $request->user_id,
+            'phone' => 'required',
+            'user_id' => 'required'
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $userId = Auth::id();
+
+        if ($request->user_id != $userId) {
+            return ApiResponseService::error('Unauthorized user.', 401);
+        }
+
+        $user = $this->UserService->updateUserInfoWithPass($request);
+        return ApiResponseService::success('User updated successfully', $user);
+    }
+
+    public function getUserDetails(Request $request)
+    {
+        $userId = Auth::id();
+
+        if ($request->user_id != $userId) {
+            return ApiResponseService::error('Unauthorized user.', 401);
+        }
+
+        $query = User::query();
+
+        if ($request->user_id) {
+            $query->where('id', $request->user_id);
+        }
+        $users = $query->get();
+        return ApiResponseService::success('User details fetched successfully', $users);
     }
 }
