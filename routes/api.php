@@ -68,6 +68,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/lists', [UserController::class, 'getUsers']);
         Route::post('/send-mail', [UserController::class, 'sendEmailToProspect']);
         Route::post('/clear-signature-mail', [UserController::class, 'clearSignatureSendMail']);
+        Route::post('/update-user-info', [UserController::class, 'updateUserInfo']);
+        Route::get('/get-user-detials', [UserController::class, 'getUserDetails']);
     });
 
     Route::group(['prefix' => 'team-member'], function () {

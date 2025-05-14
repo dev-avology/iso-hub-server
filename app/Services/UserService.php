@@ -124,4 +124,21 @@ class UserService
         $user->delete();
         return true;
     }
+
+    public function updateUserInfoWithPass($request){
+        $updated_data = [
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+        ];
+
+        $user = User::find($request->user_id);
+
+        if(isset($request->new_password) && !empty($request->new_password)){
+            $updated_data['password'] = Hash::make($request->new_password);
+        }
+        $user->update($updated_data);
+        return true;
+    }
 }
