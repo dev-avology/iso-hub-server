@@ -15,11 +15,16 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    // 'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', '*'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => [
+        'https://isohub.io',
+        'http://127.0.0.1:8000',  // ✅ Allow local frontend
+        'http://localhost:8000',  // ✅ Optional - sometimes browsers use localhost
+    ],
 
     'allowed_origins_patterns' => [],
 
