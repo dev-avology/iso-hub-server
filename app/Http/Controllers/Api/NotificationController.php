@@ -12,7 +12,7 @@ class NotificationController extends Controller
 {
     public function getUserNoticationCount($user_id)
     {
-        $user = User::find($user_id);
+        $user = User::find((int)$user_id);
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
@@ -29,22 +29,27 @@ class NotificationController extends Controller
 
     public function removeNotification(Request $request)
     {
-        $user = User::find($request->user_id);
-
+        \Log::info($request->all());
+        $user = User::find((int)$request->user_id);
+        \Log::info($user);
         if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            return ApiResponseService::error('User not found.', 400);
         }
         $user->update(['notify_count' => 0]);
+         \Log::info('updated count');
         return ApiResponseService::success('Notification count reset successfully.', []);
     }
 
     public function deleteNotification(Request $request)
     {
-        $noti = Notification::find($request->id);
+        $noti = Notification::find((int) $request->id);
+     
         if (!$noti) {
-            return ApiResponseService::error('Notification not found.', [], 404);
+           return ApiResponseService::error('Notification cant found.', 400);
         }
+
         $noti->delete();
+
         return ApiResponseService::success('Notification deleted successfully.', []);
     }
 
