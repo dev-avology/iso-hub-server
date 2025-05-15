@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['https://isohub.io','http://localhost:5173','http://localhost:5174'], // <-- IMPORTANT
 
     'allowed_origins_patterns' => [],
 

@@ -37,4 +37,20 @@ class NotificationController extends Controller
         $user->update(['notify_count' => 0]);
         return ApiResponseService::success('Notification count reset successfully.', []);
     }
+
+    public function deleteNotification(Request $request)
+    {
+        $noti = Notification::find($request->id);
+        if (!$noti) {
+            return ApiResponseService::error('Notification not found.', [], 404);
+        }
+        $noti->delete();
+        return ApiResponseService::success('Notification deleted successfully.', []);
+    }
+
+    public function deleteAllNotification(Request $request)
+    {
+        Notification::where('user_id', $request->user_id)->delete();
+        return ApiResponseService::success('All notifications deleted successfully.', []);
+    }
 }
