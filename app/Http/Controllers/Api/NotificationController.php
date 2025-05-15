@@ -10,9 +10,9 @@ use App\Models\User;
 
 class NotificationController extends Controller
 {
-    public function getUserNoticationCount(Request $request)
+    public function getUserNoticationCount($user_id)
     {
-        $user = User::find($request->user_id);
+        $user = User::find($user_id);
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
@@ -20,7 +20,7 @@ class NotificationController extends Controller
 
         $data = [
             'count' => $user->notify_count,
-            'user_notifications' => Notification::where('user_id', $request->user_id)->orderBy('created_at', 'desc')->get(),
+            'user_notifications' => Notification::where('user_id', $user_id)->orderBy('created_at', 'desc')->get(),
             'admin_notifications' => Notification::orderBy('created_at', 'desc')->get(), // Corrected here
             'status' => 'success'
         ];
