@@ -14,6 +14,8 @@ use App\Http\Controllers\Api\DropboxController;
 use App\Http\Controllers\Api\OneDriveController;
 use App\Http\Controllers\Api\MarketingController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\VendorTemplateController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -122,6 +124,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/delete-all-notification', [NotificationController::class, 'deleteAllNotification']);
     });
 
+    Route::group(['prefix' => 'vendor'], function () {
+        Route::post('/create-vendor-template', [VendorTemplateController::class, 'storeVendorTemplates']);
+        Route::post('/show-vendor-template', [VendorTemplateController::class, 'showVendorTemplate']);
+        Route::post('/get-admin-vendor', [VendorTemplateController::class, 'getAdminVendorDropdownData']);
+        Route::post('/get-all-vendors-list', [VendorTemplateController::class, 'getAllVendorsList']);
+        Route::post('/update-vendor', [VendorTemplateController::class, 'updateVendor']);
+        Route::post('/edit-vendor', [VendorTemplateController::class, 'editVendorDetails']);
+        Route::post('/delete-vendor', [VendorTemplateController::class, 'deleteVendor']);
+    });
 
 
     Route::post('jotform/lists', [JotFromController::class, 'getFormsList']);
