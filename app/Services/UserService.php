@@ -101,7 +101,7 @@ class UserService
     public function destroyTeamMember($id)
     {
         // Find the user
-        $user = TeamMember::findOrFail($id);
+        $user = User::findOrFail($id);
         // Delete the user
         $user->delete();
         return true;

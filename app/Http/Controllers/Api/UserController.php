@@ -35,21 +35,7 @@ class UserController extends Controller
 
     public function createTeamMember(Request $request)
     {
-        // Use Validator for detailed error handling
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:team_members,email',
-            'phone' => 'required',
-            'address' => 'required',
-        ]);
-
-        // Return validation errors if any
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
+        $this->userValidation($request);
 
         $permission = 'team_member.add';
         $userPermission = $this->DashboardService->checkPermission($permission);
@@ -57,15 +43,30 @@ class UserController extends Controller
         if (!empty($userPermission)) {
             return $userPermission;
         }
-
-        $user = $this->UserService->addTeamMember($request);
+        // $user = $this->UserService->addTeamMember($request);
+        $user = $this->UserService->addUser($request);
 
         return ApiResponseService::success('Team member added successfully', $user);
     }
 
     public function createUser(Request $request)
     {
-        // Use Validator for detailed error handling
+        $this->userValidation($request);
+
+        $permission = 'user.add';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
+        $user = $this->UserService->addUser($request);
+
+        return ApiResponseService::success('User added successfully', $user);
+    }
+
+    private function userValidation($request){
+         // Use Validator for detailed error handling
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -82,17 +83,6 @@ class UserController extends Controller
                 'errors' => $validator->errors(),
             ], 422);
         }
-
-        $permission = 'user.add';
-        $userPermission = $this->DashboardService->checkPermission($permission);
-
-        if (!empty($userPermission)) {
-            return $userPermission;
-        }
-
-        $user = $this->UserService->addUser($request);
-
-        return ApiResponseService::success('User added successfully', $user);
     }
 
     public function createVendor(Request $request)
@@ -187,22 +177,7 @@ class UserController extends Controller
 
     public function updateTeamMember(Request $request)
     {
-        // Use Validator for detailed error handling
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:team_members,email,' . $request->id,
-            'phone' => 'required',
-            'id' => 'required|exists:team_members,id',
-            'address' => 'required'
-        ]);
-
-        // Return validation errors if any
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
+        $this->updateUserValidation($request);
 
         $permission = 'team_member.edit';
         $userPermission = $this->DashboardService->checkPermission($permission);
@@ -210,13 +185,28 @@ class UserController extends Controller
         if (!empty($userPermission)) {
             return $userPermission;
         }
-
-        $user = $this->UserService->updateTeamMember($request);
+        // $user = $this->UserService->updateTeamMember($request);
+        $user = $this->UserService->updateUser($request);
         return ApiResponseService::success('Team member updated successfully', $user);
     }
 
     public function updateUser(Request $request)
     {
+        $this->updateUserValidation($request);
+  
+        $permission = 'user.edit';
+        $userPermission = $this->DashboardService->checkPermission($permission);
+
+        if (!empty($userPermission)) {
+            return $userPermission;
+        }
+
+        $user = $this->UserService->updateUser($request);
+        return ApiResponseService::success('User updated successfully', $user);
+    }
+
+    private function updateUserValidation($request){
+
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -232,16 +222,6 @@ class UserController extends Controller
                 'errors' => $validator->errors(),
             ], 422);
         }
-
-        $permission = 'user.edit';
-        $userPermission = $this->DashboardService->checkPermission($permission);
-
-        if (!empty($userPermission)) {
-            return $userPermission;
-        }
-
-        $user = $this->UserService->updateUser($request);
-        return ApiResponseService::success('User updated successfully', $user);
     }
 
     public function updateVendor(Request $request)
@@ -301,7 +281,7 @@ class UserController extends Controller
             return $userPermission;
         }
 
-        $user = TeamMember::find($id);
+        $user = User::find($id);
         if (!$user) {
             return ApiResponseService::error('Team member not found', 404);
         }
@@ -386,7 +366,6 @@ class UserController extends Controller
 
     public function getTeamMembersList(Request $request)
     {
-
         $permission = 'team_member.view';
         $userPermission = $this->DashboardService->checkPermission($permission);
 
@@ -394,12 +373,12 @@ class UserController extends Controller
             return $userPermission;
         }
 
-        $query = TeamMember::query();
+        $query = User::query();
 
         if ($request->id) {
             $query->where('id', $request->id);
         }
-        $team_members = $query->get();
+        $team_members = $query->where('role_id',6)->get();
         return ApiResponseService::success('Team member lists fetched successfully', $team_members);
     }
 
