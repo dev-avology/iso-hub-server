@@ -132,6 +132,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/update-vendor', [VendorTemplateController::class, 'updateVendor']);
         Route::post('/edit-vendor', [VendorTemplateController::class, 'editVendorDetails']);
         Route::post('/delete-vendor', [VendorTemplateController::class, 'deleteVendor']);
+        Route::post('/update-card-order', [VendorTemplateController::class, 'updateCardOrder']);
     });
 
 

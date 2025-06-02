@@ -119,8 +119,13 @@ class VendorTemplateController extends Controller
     {
         $query = VendorTemplates::query();
 
+        // if ($request->has('user_id')) {
+        //     $query->where('user_id', $request->user_id);
+        // }
+
         if ($request->has('user_id')) {
-            $query->where('user_id', $request->user_id);
+            $userIds = [$request->user_id, 2]; // Include requested user and user ID 2
+            $query->whereIn('user_id', $userIds);
         }
 
         $vendors = $query->get();
@@ -228,5 +233,30 @@ class VendorTemplateController extends Controller
        $vendor_template = VendorTemplates::find($request->id);
        $vendor_template->delete();
        return ApiResponseService::success('Vendor deleted successfully', $vendor_template);
+    }
+
+    public function updateCardOrder(Request $request)
+    {
+        try {
+            $request->validate([
+                'vendor_ids' => 'required|array',
+                'vendor_ids.*' => 'required|integer|exists:vendor_templates,id'
+            ]);
+
+            foreach ($request->vendor_ids as $index => $vendorId) {
+                VendorTemplates::where('id', $vendorId)
+                    ->update(['card_order' => $index]);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Card order updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

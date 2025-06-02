@@ -24,6 +24,7 @@ class VendorTemplates extends Model
         'notes',
         'support_info',
         'description',
+        'card_order',
     ];
 
     public function vendor_user(): BelongsTo
