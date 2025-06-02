@@ -128,7 +128,7 @@ class VendorTemplateController extends Controller
             $query->whereIn('user_id', $userIds);
         }
 
-        $vendors = $query->get();
+        $vendors = $query->orderBy('card_order','asc')->get();
 
         // Group vendors by type    
         $categorizedVendors = $vendors->groupBy('vendor_type')->map(function ($group) {
