@@ -128,7 +128,11 @@ class VendorTemplateController extends Controller
             $query->whereIn('user_id', $userIds);
         }
 
-        $vendors = $query->orderBy('card_order','asc')->get();
+        // $vendors = $query->orderBy('card_order','asc')->get();
+        // Get vendors grouped and sorted per user to preserve correct card_order
+        $vendors = $query->get()->groupBy('user_id')->flatMap(function ($userGroup) {
+            return $userGroup->sortBy('card_order');
+        });
 
         // Group vendors by type    
         $categorizedVendors = $vendors->groupBy('vendor_type')->map(function ($group) {
@@ -242,6 +246,8 @@ class VendorTemplateController extends Controller
                 'vendor_ids' => 'required|array',
                 'vendor_ids.*' => 'required|integer|exists:vendor_templates,id'
             ]);
+
+            \Log::info($request->all());
 
             foreach ($request->vendor_ids as $index => $vendorId) {
                 VendorTemplates::where('id', $vendorId)
