@@ -116,25 +116,38 @@ class FileController extends Controller
     {
         // Check if the string is provided
         if (!$string) {
-            return ApiResponseService::error('Missing encrypted data', 400);
+            return ApiResponseService::error('Missing data', 400);
         }
 
         try {
             // Decrypt and decode the data from the URL
-            $decryptedData = json_decode(decrypt(urldecode($string)), true);
+            // $decryptedData = json_decode(decrypt(urldecode($string)), true);
 
-            // Check if the decrypted data is valid
-            if (!is_array($decryptedData) || !isset($decryptedData['user_id'])) {
-                return ApiResponseService::error('Invalid encrypted data', 400);
-            }
+            // // Check if the decrypted data is valid
+            // if (!is_array($decryptedData) || !isset($decryptedData['user_id'])) {
+            //     return ApiResponseService::error('Invalid encrypted data', 400);
+            // }
 
-            $userId = $decryptedData['user_id'];
-            $personal_guarantee_required = $decryptedData['personal_guarantee_required'] ?? '';
-            $clear_signature = $decryptedData['clear_signature'] ?? '';
+            $parts = explode('&', $string);
+
+            // Access individual parts
+            $user_id = $parts[0]; // 2
+            $clear_signature = $parts[1]; // clearance
+            $personal_guarantee_required = $parts[2]; // yes
+            $form_id = $parts[3]; // yes
+            $email = $parts[4]; // yes
+
+            $userId = $user_id;
+            $personal_guarantee_required = $personal_guarantee_required ?? '';
+            $clear_signature = $clear_signature ?? '';
+            $form_id = $form_id ?? '';
+            $email = $email ?? '';
 
             $data = [
                 'personal_guarantee_required' => $personal_guarantee_required,
-                'clear_signature' => $clear_signature
+                'clear_signature' => $clear_signature,
+                'form_id' => $form_id,
+                'email' => $email,
             ];
 
             // Check if user_id exists in the users table
