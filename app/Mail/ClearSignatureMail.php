@@ -25,6 +25,8 @@ class ClearSignatureMail extends Mailable
         $this->data = $data;
         $encryptedData = encrypt(json_encode($this->data));
         $this->encryptedLink = env('SECURE_UPLOAD_URL') . "/" . $this->data['user_id'] . "/" .$type_segment;
+        \Log::info($this->encryptedLink);
+        \Log::info('$this->encryptedLink');
     }
     
     public function build()
