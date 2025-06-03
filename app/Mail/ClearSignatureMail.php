@@ -22,7 +22,8 @@ class ClearSignatureMail extends Mailable
     public function __construct($data)
     {
         $this->data = $data;
-        $type_segment = $this->data['clear_signature']. "-".$this->data['personal_guarantee_required'];
+
+        $type_segment = $this->data['clear_signature']. "&" .$this->data['personal_guarantee_required'] . "&" .$this->data['form_id'] . "&" .$this->data['email'];
         $this->encryptedLink = env('SECURE_UPLOAD_URL') . "/" . $this->data['user_id'] . "/" .$type_segment;
     }
     
