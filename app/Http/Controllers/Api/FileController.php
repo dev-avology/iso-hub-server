@@ -53,20 +53,29 @@ class FileController extends Controller
         $queryData = $request->unique_string;
 
         if (!$queryData) {
-            return ApiResponseService::error('Missing encrypted data', 400);
+            return ApiResponseService::error('Missing data', 400);
         }
 
         $userId = null;
         $email_id = null;
         try {
+            $parts = explode('&', $queryData);
+
+            // Access individual parts
+            $user_id = $parts[0]; // 2
+            $clear_signature = $parts[1]; // clearance
+            $personal_guarantee_required = $parts[2]; // yes
+            $form_id = $parts[3]; // yes
+            $email = $parts[4]; // yes
+
             // Decrypt and decode the data from the URL
-            $decryptedData = json_decode(decrypt(urldecode($queryData)), true);
-            $userId = $decryptedData['user_id'] ?? null;
-            $name = $decryptedData['name'] ?? null;
-            $form_id = $decryptedData['form_id'] ?? null;
-            $personal_guarantee_required = $decryptedData['personal_guarantee_required'] ?? null;
-            $clear_signature = $decryptedData['clear_signature'] ?? null;
-            $email_id = $decryptedData['email'] ?? null;
+            $userId = $user_id ?? null;
+            $name = null;
+            $form_id = $form_id ?? null;
+            $personal_guarantee_required = $personal_guarantee_required ?? null;
+            $clear_signature = $clear_signature ?? null;
+            $email_id = $email ?? null;
+
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
             return ApiResponseService::error('Invalid encrypted data', 400);
         }
