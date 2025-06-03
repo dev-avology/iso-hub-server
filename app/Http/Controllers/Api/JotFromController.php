@@ -92,78 +92,80 @@ class JotFromController extends Controller
         //     ], 422);
         // }
 
-        $queryData = $request->unique_string;
+        $user_id = $request->user_id;
 
-        if (!$queryData) {
-            return ApiResponseService::error('Missing encrypted data', 400);
+        if (!$user_id) {
+            return ApiResponseService::error('Missing data', 400);
         }
-        $userId = null;
         $business_dba = null;
         $message = null;
-        try {
-            // Decrypt and decode the data from the URL
-            $decryptedData = json_decode(decrypt(urldecode($queryData)), true);
-            $userId = $decryptedData['user_id'] ?? null;
-            $business_dba = $request->business_dba ?? null;
+        // try {
+        //     // Decrypt and decode the data from the URL
+        //     $decryptedData = json_decode(decrypt(urldecode($queryData)), true);
+        //     $userId = $decryptedData['user_id'] ?? null;
+        //     $business_dba = $request->business_dba ?? null;
 
-            if (isset($decryptedData['is_duplicate']) && ($decryptedData['is_duplicate'] == '1')) {
-                $message = 'Replicated JotForm submission (' . $business_dba . ').';
-            } else {
-                $message = 'New JotForm submission (' . $business_dba . ').';
-            }
-        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            return ApiResponseService::error('Invalid encrypted data', 400);
-        }
+        //     if (isset($decryptedData['is_duplicate']) && ($decryptedData['is_duplicate'] == '1')) {
+        //         $message = 'Replicated JotForm submission (' . $business_dba . ').';
+        //     } else {
+        //         $message = 'New JotForm submission (' . $business_dba . ').';
+        //     }
+        // } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+        //     return ApiResponseService::error('Invalid encrypted data', 400);
+        // }
 
-        $form = $this->JotFormService->create($request, $userId);
+        $business_dba = $request->business_dba ?? null;
+        $message = 'New JotForm submission (' . $business_dba . ').';
+
+        $form = $this->JotFormService->create($request, $user_id);
         if ($form) {
-            $this->FileService->notifyUser($userId, $message);
+            $this->FileService->notifyUser($user_id, $message);
         }
         return ApiResponseService::success('Forms Created Successfully', $form);
     }
 
-    public function jotFormcheckUniqueString($string)
+    public function jotFormcheckUniqueString($user_id)
     {
-        if (!$string) {
-            return ApiResponseService::error('Missing encrypted data', 400);
+        if (!$user_id) {
+            return ApiResponseService::error('Missing data', 400);
         }
 
         try {
             // Decrypt and decode the data from the URL
-            $decryptedData = json_decode(decrypt(urldecode($string)), true);
+            // $decryptedData = json_decode(decrypt(urldecode($string)), true);
 
             // Check if the decrypted data is valid
-            if (!is_array($decryptedData) || !isset($decryptedData['user_id'])) {
-                return ApiResponseService::error('Invalid encrypted data', 400);
-            }
+            // if (!is_array($decryptedData) || !isset($decryptedData['user_id'])) {
+            //     return ApiResponseService::error('Invalid encrypted data', 400);
+            // }
 
-            // Check if secret verification is required
-            if (!isset($decryptedData['is_duplicate'])) {
-                if (!isset($decryptedData['secret']) || $decryptedData['secret'] !== 'jotform_URD_!@#9823_secret$%DEC8901') {
-                    return ApiResponseService::error('Invalid encrypted data', 400);
-                }
-            }
+            // // Check if secret verification is required
+            // if (!isset($decryptedData['is_duplicate'])) {
+            //     if (!isset($decryptedData['secret']) || $decryptedData['secret'] !== 'jotform_URD_!@#9823_secret$%DEC8901') {
+            //         return ApiResponseService::error('Invalid encrypted data', 400);
+            //     }
+            // }
 
-            $userId = $decryptedData['user_id'];
+            // $userId = $user_id;
             // Check if user_id exists in the users table
-            $user = User::find($userId);
+            $user = User::find($user_id);
 
             if (!$user) {
-                return ApiResponseService::error('Invalid encrypted data', 400);
+                return ApiResponseService::error('Invalid data', 400);
             }
 
             $data = [];
 
-            if (isset($decryptedData['is_duplicate'])) {
-                foreach ($decryptedData as $key => $value) {
-                    $data[$key] = $value;
-                }
-            }
+            // if (isset($decryptedData['is_duplicate'])) {
+            //     foreach ($decryptedData as $key => $value) {
+            //         $data[$key] = $value;
+            //     }
+            // }
             // Return success with user data if everything is valid
             return ApiResponseService::success('Data verified successfully', $data);
         } catch (\Exception $e) {
             // Handle decryption error or invalid string
-            return ApiResponseService::error('Invalid encrypted data format', 400);
+            return ApiResponseService::error('Invalid data format', 400);
         }
     }
 
