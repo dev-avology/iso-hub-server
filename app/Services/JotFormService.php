@@ -47,7 +47,7 @@ class JotFormService
             'business_phone_number' => $request->business_phone_number ?? '',
             'business_contact_name' => $request->business_contact_name ?? '',
             'business_contact_number' => $request->business_contact_number ?? '',
-            'business_start_date' => $request->business_start_date ?? '',
+            'business_start_date' => !empty($request->business_start_date) ? $request->business_start_date : null,
             'business_tax_id' => $request->business_tax_id ?? '',
             'business_profile_business_type' => json_encode($request->business_profile_business_type) ?? '',
 
