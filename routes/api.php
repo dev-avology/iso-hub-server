@@ -30,8 +30,10 @@ use App\Http\Controllers\Api\VendorTemplateController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/upload-files', [FileController::class, 'uploadFiles']);
+Route::post('/upload-user-files', [FileController::class, 'uploadUserFiles']);
 Route::post('/jot-forms', [JotFromController::class, 'createForm']);
 Route::get('/file/check-unique-string/{string}', [FileController::class, 'checkUniqueString']);
+Route::get('/file/check-unique-string-for-user/{string}', [FileController::class, 'checkUniqueStringForUser']);
 Route::get('/jotform-check-unique-string/{string}', [JotFromController::class, 'jotFormcheckUniqueString']);
 
 // Google Drive routes

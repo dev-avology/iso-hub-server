@@ -52,6 +52,41 @@ class FileService
        return $uploaded_files;
     }
 
+    public function uploadUserFiles($request, $user_id, $name, $email_id)
+    {
+        $paths = [];
+        // Store each uploaded file
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                $storedPath = $file->store('uploads', 'public');
+                $original_name = $file->getClientOriginalName();
+                $images = [
+                    'user_id' => $user_id,
+                    'form_id' => null,
+                    'file_path' => asset('storage/' . $storedPath), // Correct path
+                    'prospect_name' => $name, // Correct path
+                    'file_original_name' => $original_name,
+                    'email' => $email_id
+                ];
+                UploadFiles::create($images);
+                $paths[] = asset('storage/' . $storedPath);
+            }
+            $uploaded_files = array_map(fn($path) => asset($path), $paths);
+        }
+
+        // $jotform_data = [
+        //     'signature' => $request->signature,
+        //     'signature_date' => $request->signature_date,
+        //     'personal_guarantee_required' => null,
+        //     'clear_signature' => null,
+        //     'mail_status' => 2
+        // ];
+
+    //    $form = JotForm::find($form_id);
+    //    $form->update($jotform_data);
+       return $uploaded_files;
+    }
+
     public function destroyFile($id)
     {
         $file = UploadFiles::findOrFail($id);
