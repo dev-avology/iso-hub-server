@@ -24,10 +24,16 @@ class ProspectMail extends Mailable
         // Encrypt user_id and email_id
         $this->email = $email_id;
         $this->name = $name;
-        $encryptedData = encrypt(json_encode(['user_id' => $userId, 'email_id' => $email_id, 'name' => $name]));
+        // $encryptedData = encrypt(json_encode(['user_id' => $userId, 'email_id' => $email_id, 'name' => $name]));
 
         // Get the secure upload URL from .env
-        $this->encryptedLink = env('SECURE_UPLOAD_URL') . "?data=" . urlencode($encryptedData);
+        // $this->encryptedLink = env('SECURE_UPLOAD_URL') . "?data=" . urlencode($encryptedData);
+
+
+        $type_segment = $userId. "&" .$this->name . "&" .$this->email;
+        $this->encryptedLink = env('SECURE_UPLOADS_URL') . "/" .$type_segment ;
+
+
     }
     
     public function build()

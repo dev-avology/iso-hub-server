@@ -89,6 +89,59 @@ class FileController extends Controller
         return ApiResponseService::error('No file uploaded', 400);
     }
 
+    public function uploadUserFiles(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'files' => 'required',
+            'files.*' => 'mimes:jpg,jpeg,png,gif,pdf,doc,docx,xls,xlsx,csv,txt', // Each file max 5MB
+            'unique_string' => 'required',
+            // 'signature_date' => 'required',
+            // 'signature' => 'required'
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $queryData = $request->unique_string;
+
+        if (!$queryData) {
+            return ApiResponseService::error('Missing data', 400);
+        }
+
+        $userId = null;
+        $email_id = null;
+        try {
+            $parts = explode('&', $queryData);
+
+            // Access individual parts
+            $user_id = $parts[0]; // 2
+            $name = $parts[1]; // clearance
+            $email = $parts[2]; // yes
+        
+
+            // Decrypt and decode the data from the URL
+            $userId = $user_id ?? null;
+            $name = $name ?? null;
+            $email_id = $email ?? null;
+
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            return ApiResponseService::error('Invalid encrypted data', 400);
+        }
+
+        $fileUploades = $this->FileService->uploadUserFiles($request, $userId, $name, $email_id);
+        $message = 'New document submitted by ' . $email_id;
+        if ($fileUploades) {
+            $this->FileService->notifyUser($userId, $message);
+            return ApiResponseService::success('Files uploaded successfully!', $fileUploades);
+        }
+        return ApiResponseService::error('No file uploaded', 400);
+    }
+
     public function getProspectFiles($id)
     {
         $user_id = Auth::id();
@@ -156,6 +209,54 @@ class FileController extends Controller
                 'personal_guarantee_required' => $personal_guarantee_required,
                 'clear_signature' => $clear_signature,
                 'form_id' => $form_id,
+                'email' => $email,
+            ];
+
+            // Check if user_id exists in the users table
+            $user = User::find($userId);
+
+            if (!$user) {
+                return ApiResponseService::error('Invalid encrypted data', 400);
+            }
+
+            // Return success with user data if everything is valid
+            return ApiResponseService::success('Data verified successfully', $data);
+        } catch (\Exception $e) {
+            // Handle decryption error or invalid string
+            return ApiResponseService::error('Invalid encrypted data format', 400);
+        }
+    }
+
+      public function checkUniqueStringForUser($string)
+    {
+        // Check if the string is provided
+        if (!$string) {
+            return ApiResponseService::error('Missing data', 400);
+        }
+
+        try {
+            // Decrypt and decode the data from the URL
+            // $decryptedData = json_decode(decrypt(urldecode($string)), true);
+
+            // // Check if the decrypted data is valid
+            // if (!is_array($decryptedData) || !isset($decryptedData['user_id'])) {
+            //     return ApiResponseService::error('Invalid encrypted data', 400);
+            // }
+
+            $parts = explode('&', $string);
+
+            // Access individual parts
+            $user_id = $parts[0]; // 2
+            $name = $parts[1]; // clearance
+            $email = $parts[2]; // yes
+
+            $userId = $user_id;
+            $name = $name ?? '';
+            $email = $email ?? '';
+
+            $data = [
+                'userId' => $userId,
+                'name' => $name,
                 'email' => $email,
             ];
 
