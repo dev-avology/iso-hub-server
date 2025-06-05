@@ -92,6 +92,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::group(['prefix' => 'file'], function () {
         Route::get('/lists/{id}', [FileController::class, 'getProspectFiles']);
+        Route::get('/user-lists/{id}', [FileController::class, 'getUserFiles']);
         Route::get('/delete/{id}', [FileController::class, 'destroyFile']);
         Route::get('/download/{id}', [FileController::class, 'downloadFile']);
         Route::get('/download-zip/{id}', [FileController::class, 'downloadZipFile']);

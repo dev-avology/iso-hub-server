@@ -158,6 +158,29 @@ class FileController extends Controller
         return ApiResponseService::success('Files list fetched successfully', $files);
     }
 
+    public function getUserFiles($id)
+    {
+        $user_id = Auth::id();
+
+        if ($id != $user_id) {
+            return ApiResponseService::error('Unauthorized user.', 401);
+        }
+
+        $files = Auth::user()->hasRole(['admin', 'superadmin'])
+        ? UploadFiles::where(function($query) {
+            $query->whereNull('form_id')
+                ->orWhere('form_id', '');
+        })->orderBy('created_at', 'desc')->get()
+        : UploadFiles::where(function($query) use ($id) {
+            $query->whereNull('form_id')
+                ->orWhere('form_id', '');
+        })->where('user_id', $id)
+        ->orderBy('created_at', 'desc')->get();
+
+
+        return ApiResponseService::success('Files list fetched successfully', $files);
+    }
+
 
     public function destroyFile($id)
     {
