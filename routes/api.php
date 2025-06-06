@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\OneDriveController;
 use App\Http\Controllers\Api\MarketingController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\VendorTemplateController;
+use App\Http\Controllers\Api\SecureTracerDataController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,7 @@ Route::post('/jot-forms', [JotFromController::class, 'createForm']);
 Route::get('/file/check-unique-string/{string}', [FileController::class, 'checkUniqueString']);
 Route::get('/file/check-unique-string-for-user/{string}', [FileController::class, 'checkUniqueStringForUser']);
 Route::get('/jotform-check-unique-string/{string}', [JotFromController::class, 'jotFormcheckUniqueString']);
+Route::post('/decrypt/cred', [SecureTracerDataController::class, 'decryptCred']);
 
 // Google Drive routes
 Route::get('auth/google/callback', [NewGoogleDriveController::class, 'handleGoogleCallback']);
@@ -138,7 +140,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/update-card-order', [VendorTemplateController::class, 'updateCardOrder']);
     });
 
-
+    Route::post('/encrypt/cred', [SecureTracerDataController::class, 'encryptCred']);
     Route::post('jotform/lists', [JotFromController::class, 'getFormsList']);
     Route::get('jotform/{id}', [JotFromController::class, 'getFromDetails']);
     Route::post('duplicate-form-send-mail', [JotFromController::class, 'sendFormDuplicateMail']);
