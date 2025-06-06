@@ -115,7 +115,8 @@ class JotFromController extends Controller
         // }
 
         $business_dba = $request->business_dba ?? null;
-        $message = 'New JotForm submission (' . $business_dba . ').';
+        // $message = 'new Pre-Application (' . $business_dba . ').';
+        $message = 'new Pre-Application.';
 
         $form = $this->JotFormService->create($request, $user_id);
         if ($form) {
