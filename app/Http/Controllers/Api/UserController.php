@@ -35,7 +35,11 @@ class UserController extends Controller
 
     public function createTeamMember(Request $request)
     {
-        $this->userValidation($request);
+        $validationResponse = $this->userValidation($request);
+
+        if ($validationResponse) {
+           return $validationResponse; // return validation error response
+        }
 
         $permission = 'team_member.add';
         $userPermission = $this->DashboardService->checkPermission($permission);
@@ -51,7 +55,12 @@ class UserController extends Controller
 
     public function createUser(Request $request)
     {
-        $this->userValidation($request);
+        $validationResponse = $this->userValidation($request);
+
+        if ($validationResponse) {
+           return $validationResponse; // return validation error response
+        }
+
 
         $permission = 'user.add';
         $userPermission = $this->DashboardService->checkPermission($permission);
@@ -177,7 +186,11 @@ class UserController extends Controller
 
     public function updateTeamMember(Request $request)
     {
-        $this->updateUserValidation($request);
+        $validationResponse = $this->updateUserValidation($request);
+
+        if ($validationResponse) {
+           return $validationResponse; // return validation error response
+        }
 
         $permission = 'team_member.edit';
         $userPermission = $this->DashboardService->checkPermission($permission);
@@ -192,7 +205,11 @@ class UserController extends Controller
 
     public function updateUser(Request $request)
     {
-        $this->updateUserValidation($request);
+        $validationResponse = $this->updateUserValidation($request);
+        
+        if ($validationResponse) {
+           return $validationResponse; // return validation error response
+        }
   
         $permission = 'user.edit';
         $userPermission = $this->DashboardService->checkPermission($permission);
