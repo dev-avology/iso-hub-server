@@ -25,7 +25,11 @@ class SecureTracerDataController  extends Controller
 {
     public function encryptCred()
     {
-        $encString = "cburnell24:Summer2024!"; // simulate .env data
+        $user = Auth::user();
+        $email = $user->email;
+        // $password = $user->password;
+        $time = time();
+        $encString = $email . ':' . $time; // simulate .env data
 
         $key = substr(hash('sha256', env('ENCRYPTION_SECRET')), 0, 32);
         $iv = openssl_random_pseudo_bytes(16);
@@ -59,8 +63,21 @@ class SecureTracerDataController  extends Controller
 
         $decrypted = openssl_decrypt($request->cipher, 'AES-256-CBC', $key, 0, $iv);
 
+        if (!$decrypted || !str_contains($decrypted, ':')) {
+            return response()->json(['message' => 'Invalid or corrupted data.'], 400);
+        }
+
+        [$email, $timestamp] = explode(':', $decrypted);
+
+        // Check if the token is older than 10 minutes
+        if (time() - (int)$timestamp > 600) {
+            return response()->json(['message' => 'Token has expired.'], 401);
+        }
+
         return response()->json([
             'decrypted' => $decrypted,
+            'email' => $email,
+            'timestamp' => $timestamp,
         ]);
     }
 }
