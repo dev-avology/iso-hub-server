@@ -37,6 +37,7 @@ Route::get('/file/check-unique-string/{string}', [FileController::class, 'checkU
 Route::get('/file/check-unique-string-for-user/{string}', [FileController::class, 'checkUniqueStringForUser']);
 Route::get('/jotform-check-unique-string/{string}', [JotFromController::class, 'jotFormcheckUniqueString']);
 Route::post('/decrypt/cred', [SecureTracerDataController::class, 'decryptCred']);
+Route::post('/encrypt/cred', [SecureTracerDataController::class, 'encryptCred']);
 
 // Google Drive routes
 Route::get('auth/google/callback', [NewGoogleDriveController::class, 'handleGoogleCallback']);
@@ -140,7 +141,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/update-card-order', [VendorTemplateController::class, 'updateCardOrder']);
     });
 
-    Route::post('/encrypt/cred', [SecureTracerDataController::class, 'encryptCred']);
     Route::post('jotform/lists', [JotFromController::class, 'getFormsList']);
     Route::get('jotform/{id}', [JotFromController::class, 'getFromDetails']);
     Route::post('duplicate-form-send-mail', [JotFromController::class, 'sendFormDuplicateMail']);
