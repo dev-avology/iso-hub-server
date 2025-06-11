@@ -23,10 +23,9 @@ use Illuminate\Support\Facades\Crypt;
 
 class SecureTracerDataController  extends Controller
 {
-    public function encryptCred()
+    public function encryptCred(Request $request)
     {
-        $user = Auth::user();
-        $email = $user->email;
+        $email = $request->email;
         // $password = $user->password;
         $time = time();
         $encString = $email . ':' . $time; // simulate .env data
