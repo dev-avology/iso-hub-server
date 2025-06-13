@@ -60,8 +60,7 @@ class UserController extends Controller
         if ($validationResponse) {
            return $validationResponse; // return validation error response
         }
-
-
+        
         $permission = 'user.add';
         $userPermission = $this->DashboardService->checkPermission($permission);
 
@@ -76,6 +75,14 @@ class UserController extends Controller
 
     private function userValidation($request){
          // Use Validator for detailed error handling
+
+        if ($request->type === 'tracer') {
+            $request->merge([
+                'first_name' => $request->fName,
+                'last_name' => $request->lName,
+            ]);
+        }
+
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
