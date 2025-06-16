@@ -38,7 +38,7 @@ class UserController extends Controller
         $validationResponse = $this->userValidation($request);
 
         if ($validationResponse) {
-           return $validationResponse; // return validation error response
+            return $validationResponse; // return validation error response
         }
 
         $permission = 'team_member.add';
@@ -58,9 +58,9 @@ class UserController extends Controller
         $validationResponse = $this->userValidation($request);
 
         if ($validationResponse) {
-           return $validationResponse; // return validation error response
+            return $validationResponse; // return validation error response
         }
-        
+
         $permission = 'user.add';
         $userPermission = $this->DashboardService->checkPermission($permission);
 
@@ -73,8 +73,9 @@ class UserController extends Controller
         return ApiResponseService::success('User added successfully', $user);
     }
 
-    private function userValidation($request){
-         // Use Validator for detailed error handling
+    private function userValidation($request)
+    {
+        // Use Validator for detailed error handling
 
         if ($request->type === 'tracer') {
             $request->merge([
@@ -196,7 +197,7 @@ class UserController extends Controller
         $validationResponse = $this->updateUserValidation($request);
 
         if ($validationResponse) {
-           return $validationResponse; // return validation error response
+            return $validationResponse; // return validation error response
         }
 
         $permission = 'team_member.edit';
@@ -213,11 +214,11 @@ class UserController extends Controller
     public function updateUser(Request $request)
     {
         $validationResponse = $this->updateUserValidation($request);
-        
+
         if ($validationResponse) {
-           return $validationResponse; // return validation error response
+            return $validationResponse; // return validation error response
         }
-  
+
         $permission = 'user.edit';
         $userPermission = $this->DashboardService->checkPermission($permission);
 
@@ -229,7 +230,8 @@ class UserController extends Controller
         return ApiResponseService::success('User updated successfully', $user);
     }
 
-    private function updateUserValidation($request){
+    private function updateUserValidation($request)
+    {
 
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:255',
@@ -402,7 +404,7 @@ class UserController extends Controller
         if ($request->id) {
             $query->where('id', $request->id);
         }
-        $team_members = $query->where('role_id',6)->get();
+        $team_members = $query->where('role_id', 6)->get();
         return ApiResponseService::success('Team member lists fetched successfully', $team_members);
     }
 
@@ -591,5 +593,29 @@ class UserController extends Controller
         }
         $users = $query->first();
         return ApiResponseService::success('User details fetched successfully', $users);
+    }
+
+    public function verifySession(Request $request)
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['valid' => false]);
+        }
+
+        // Verify that the user's role_id matches what's stored
+        if ($user->role_id != $request->role_id) {
+            return response()->json(['valid' => false]);
+        }
+
+        if ($user->id != $request->user_id) {
+            return response()->json(['valid' => false]);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'roles' => $user->roles->pluck('name'),
+            'permissions' => $user->permissions->pluck('name')
+        ]);
     }
 }
