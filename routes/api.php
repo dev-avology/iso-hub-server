@@ -147,6 +147,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('destroy-jotform/{id}', [JotFromController::class, 'destroyJotForm']);
     Route::post('generate-form-token', [JotFromController::class, 'generateFormToken']);
     Route::post('chat-hash', [JotFromController::class, 'getChatHash']);
+    Route::post('/verify-session', [UserController::class, 'verifySession']);
 
 
     // Google Drive Routes
