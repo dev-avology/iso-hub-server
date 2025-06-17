@@ -12,7 +12,7 @@
         <p><strong>Email:</strong> {{ $data['email'] }}</p>
         <p><strong>Password:</strong> {{ $data['password'] }}</p>
 
-        <p>Please change your password after logging in for security purposes.</p>
+        {{-- <p>Please change your password after logging in for security purposes.</p> --}}
 
         <p style="margin-top: 30px;">
             <a href="{{ $data['login_url'] }}" style="background-color: #1d72b8; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login to ISO HUB</a>
