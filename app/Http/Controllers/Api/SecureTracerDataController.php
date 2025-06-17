@@ -87,7 +87,9 @@ class SecureTracerDataController  extends Controller
             'name' => 'required|string',
             'email' => 'required|string',
             'password' => 'required|string',
-            "user_id" => "required"
+            "user_id" => "required",
+            "website_name" => 'required',
+            "website_url" => "required"
         ]);
 
         if ($validator->fails()) {
@@ -108,13 +110,14 @@ class SecureTracerDataController  extends Controller
             return response()->json(['error' => true,'message' => "something went wrong"]);
         }
 
-        $login_url = env("WEBSITE_URL")."login";
+        $login_url = $request->website_url;
 
         $data = [
             'name' => $request->name ?? '',
             'email' => $request->email ?? '',
             'password' => $request->password ?? '',
-            'login_url' => $login_url
+            'login_url' => $login_url,
+            'website_name' => $request->website_name
         ];
 
         Mail::to($request->email)->send(new SendUserCredentialsMail($data));
