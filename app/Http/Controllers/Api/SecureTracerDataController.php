@@ -108,7 +108,7 @@ class SecureTracerDataController  extends Controller
             return response()->json(['error' => true,'message' => "something went wrong"]);
         }
 
-        $login_url = env("WEBSITE_URL")."/login";
+        $login_url = env("WEBSITE_URL")."login";
 
         $data = [
             'name' => $request->name ?? '',
