@@ -20,6 +20,7 @@ use App\Models\JotForm;
 use App\Models\Rep;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use App\Mail\SendUserCredentialsMail;
 
 class SecureTracerDataController  extends Controller
 {
@@ -78,5 +79,45 @@ class SecureTracerDataController  extends Controller
             'email' => $email,
             'timestamp' => $timestamp,
         ]);
+    }
+
+    public function sendCredentialsToUser(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'email' => 'required|string',
+            'password' => 'required|string',
+            "user_id" => "required"
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['error' => true,'message' => "something went wrong"]);
+        }
+
+        // Verify that the user's role_id matches what's stored
+        if ($user->id != $request->user_id) {
+            return response()->json(['error' => true,'message' => "something went wrong"]);
+        }
+
+        $login_url = env("WEBSITE_URL")."/login";
+
+        $data = [
+            'name' => $request->name ?? '',
+            'email' => $request->email ?? '',
+            'password' => $request->password ?? '',
+            'login_url' => $login_url
+        ];
+
+        Mail::to($request->email)->send(new SendUserCredentialsMail($data));
+        return response()->json(['message' => 'Credentials sent successfully.']);
     }
 }
