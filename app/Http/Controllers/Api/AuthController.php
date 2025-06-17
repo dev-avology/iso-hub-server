@@ -89,6 +89,12 @@ class AuthController extends Controller
            
         } 
 
+           // ✅ If agreement is provided and equals 1, update the user
+        if ($request->has('is_agreement') && $request->is_agreement == 1) {
+            $user->is_agreement = 1;
+            $user->save();
+        }
+
 
 
         // Generate authentication token
