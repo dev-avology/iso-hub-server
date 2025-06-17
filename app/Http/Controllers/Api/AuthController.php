@@ -52,6 +52,35 @@ class AuthController extends Controller
         ], 201);
     }
 
+    public function checkIsAgreement(Request $request){
+       // Use Validator for detailed error handling
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        // Return validation errors if any
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        // Find user by email
+        $user = User::where('email', $request->email)->first();
+
+        // Check if user exists and password is correct
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
+        }
+        
+        return response()->json([
+            'message' => 'IS Aggrement',
+            'user' => $user
+        ]);
+    }
+
     public function login(Request $request)
     {
         // Use Validator for detailed error handling
@@ -78,27 +107,49 @@ class AuthController extends Controller
             }
         }
 
-         // ✅ Check if user has agreed
+        // ✅ Check if user has agreed
 
-        if(!isset($request->is_agreement) && ($request->is_agreement != 1)){
-           
-            return response()->json([
-                'message' => 'User has not accepted the agreement.',
-                'agreement_required' => true
-            ], 403); // Forbidden
-           
-        } 
+        // if($request->is_slug){
+        //     if ($request->has('is_agreement') && $request->is_agreement == '1') {
+        //         if(!isset($request->is_agreement) && ($request->is_agreement != 1)){
+                    
+        //             return response()->json([
+        //                 'message' => 'User has not accepted the agreement.',
+        //                 'agreement_required' => true
+        //             ], 403); // Forbidden
+                    
+        //         } 
+        
+        //         // ✅ If agreement is provided and equals 1, update the user
+        //         if ($request->has('is_agreement') && $request->is_agreement == 1) {
+        //             $user->is_agreement = 1;
+        //             $user->save();
+        //         }
+        //     }
+        // }
 
-
-
+         // Handle agreement check for manual login (is_slug)
+       if($request->has('is_slug') && $request->is_slug == '1') {
+        // If user hasn't agreed and no agreement is provided, return error
+            if ($user->is_agreement != 1 && (!$request->has('is_agreement') || $request->is_agreement != '1')) {
+                return response()->json([
+                    'message' => 'User has not accepted the agreement.',
+                    'agreement_required' => true
+                ], 403);
+            }
+        }
+        
+        // If agreement is provided and equals 1, update the user
+        if ($request->has('is_agreement') && $request->is_agreement == '1') {
+            $user->is_agreement = 1;
+            $user->save();
+        }
         // Generate authentication token
         $token = $user->createToken('auth_token')->plainTextToken;
 
         // Get user's roles and permissions using Spatie
         $roles = $user->getRoleNames(); // Returns a collection of role names
         $permissions = $user->getAllPermissions()->pluck('name'); // Get all permissions assigned
-
-
 
         return response()->json([
             'message' => 'Login successful',
