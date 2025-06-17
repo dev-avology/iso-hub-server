@@ -57,7 +57,7 @@ class AuthController extends Controller
         // Use Validator for detailed error handling
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string',
         ]);
 
         // Return validation errors if any
@@ -78,12 +78,27 @@ class AuthController extends Controller
             }
         }
 
+         // ✅ Check if user has agreed
+
+        if(!isset($request->is_agreement) && ($request->is_agreement != 1)){
+           
+            return response()->json([
+                'message' => 'User has not accepted the agreement.',
+                'agreement_required' => true
+            ], 403); // Forbidden
+           
+        } 
+
+
+
         // Generate authentication token
         $token = $user->createToken('auth_token')->plainTextToken;
 
         // Get user's roles and permissions using Spatie
         $roles = $user->getRoleNames(); // Returns a collection of role names
         $permissions = $user->getAllPermissions()->pluck('name'); // Get all permissions assigned
+
+
 
         return response()->json([
             'message' => 'Login successful',
