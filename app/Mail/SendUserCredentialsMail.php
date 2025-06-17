@@ -25,7 +25,7 @@ class SendUserCredentialsMail extends Mailable
     public function build()
     {
         return $this->from(env('MAIL_FROM_ADDRESS'))
-            ->subject("You have received your ISO Hub login credentials.")
+            ->subject("You have received your " . $this->data['website_name'] . " login credentials.")
             ->view('mail.user_credentials_mail')
             ->with([
                 'data' => $this->data,
