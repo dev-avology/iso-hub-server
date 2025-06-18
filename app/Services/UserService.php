@@ -40,6 +40,11 @@ class UserService
             'unique_string' => Str::random(32),
         ]);
 
+        // Only add birthday if it exists in the request
+        if ($request->filled('birthday')) {
+            $user['birthday'] = $request->birthday;
+        }
+
         // Assign role to user
         $role = Role::where('id', $user->role_id)->first();
         if ($role) {
