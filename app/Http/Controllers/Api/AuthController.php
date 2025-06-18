@@ -107,28 +107,9 @@ class AuthController extends Controller
             }
         }
 
-        // ✅ Check if user has agreed
 
-        // if($request->is_slug){
-        //     if ($request->has('is_agreement') && $request->is_agreement == '1') {
-        //         if(!isset($request->is_agreement) && ($request->is_agreement != 1)){
-                    
-        //             return response()->json([
-        //                 'message' => 'User has not accepted the agreement.',
-        //                 'agreement_required' => true
-        //             ], 403); // Forbidden
-                    
-        //         } 
-        
-        //         // ✅ If agreement is provided and equals 1, update the user
-        //         if ($request->has('is_agreement') && $request->is_agreement == 1) {
-        //             $user->is_agreement = 1;
-        //             $user->save();
-        //         }
-        //     }
-        // }
+       // Handle agreement check for manual login (is_slug)
 
-         // Handle agreement check for manual login (is_slug)
        if($request->has('is_slug') && $request->is_slug == '1') {
         // If user hasn't agreed and no agreement is provided, return error
             if ($user->is_agreement != 1 && (!$request->has('is_agreement') || $request->is_agreement != '1')) {
