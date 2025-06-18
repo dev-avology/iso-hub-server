@@ -29,6 +29,7 @@ class UserService
 
     public function addUser($request)
     {
+        \Log::info($request->all());
         // Create the user
         $user = User::create([
             'first_name' => $request->first_name,
@@ -38,6 +39,7 @@ class UserService
             'role_id' => $request->role_id,
             'password' => Hash::make($request->password), // Encrypt password
             'unique_string' => Str::random(32),
+            'birthday' => $request->birthday ?? null
         ]);
 
         // Assign role to user
@@ -81,7 +83,8 @@ class UserService
             'last_name' => $request->last_name,
             'email' => $request->email,
             'phone' => $request->phone,
-            'role_id' => $request->role_id
+            'role_id' => $request->role_id,
+            'birthday' => $request->birthday ?? null
         ]);
         return $user;
     }
