@@ -105,9 +105,12 @@ class SecureTracerDataController  extends Controller
             return response()->json(['error' => true,'message' => "something went wrong"]);
         }
 
-        // Verify that the user's role_id matches what's stored
-        if ($user->id != $request->user_id) {
-            return response()->json(['error' => true,'message' => "something went wrong"]);
+        // Check if the user has role_id 1 (Admin) or 2 (Manager)
+        if (!in_array($user->role_id, [1, 2])) {
+            return response()->json([
+                'error' => true,
+                'message' => 'You do not have permission to perform this action.',
+            ], 403);
         }
 
         $login_url = $request->website_url;
