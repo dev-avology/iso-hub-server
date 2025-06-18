@@ -19,13 +19,24 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    // 'allowed_origins' => ['*'],
+    'allowed_origins' => [
+        'https://isohub.io',
+        'https://www.isohub.io',
+        'https://dev.tracerpos.com',
+        'http://localhost:3000',     // local React (default)
+        'http://127.0.0.1:3000',     // local React (loopback)
+        'http://localhost',          // optional fallback
+        'http://127.0.0.1',          // optional fallback
+    ],
 
     'allowed_origins_patterns' => [],
 
     'allowed_headers' => ['*'],
 
     'exposed_headers' => [],
+
+    'allowed_methods' => ['*'],
 
     'max_age' => 0,
 
