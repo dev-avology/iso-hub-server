@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Symfony\Component\HttpFoundation\Response;
 
 class Handler extends ExceptionHandler
 {
@@ -44,5 +45,29 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    /**
+     * Render an exception into an HTTP response.
+     */
+    public function render($request, Throwable $exception): \Symfony\Component\HttpFoundation\Response
+    {
+        $response = parent::render($request, $exception);
+
+        $allowedOrigins = [
+            'https://isohub.io',
+            'https://dev.tracerpos.com',
+        ];
+
+        $origin = $request->headers->get('Origin');
+
+        if (in_array($origin, $allowedOrigins)) {
+            $response->headers->set('Access-Control-Allow-Origin', $origin);
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization');
+            $response->headers->set('Access-Control-Allow-Credentials', 'true'); // optional if you're using cookies/sessions
+        }
+
+        return $response;
     }
 }
