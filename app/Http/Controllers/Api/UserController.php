@@ -94,12 +94,12 @@ class UserController extends Controller
         ]);
 
        // Return validation errors if any
-
+        
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $validator->errors(),
-            ]);
+            ], 422);
         }
     }
 
