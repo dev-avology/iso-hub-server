@@ -93,12 +93,17 @@ class UserController extends Controller
             'password' => 'required',
         ]);
 
-        // Return validation errors if any
+
+        return response()->json([
+            'error' => true,
+            'message' => 'failed error'
+        ]);        // Return validation errors if any
+        
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $validator->errors(),
-            ], 212);
+            ], 422);
         }
     }
 
