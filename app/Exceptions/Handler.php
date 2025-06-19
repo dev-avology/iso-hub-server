@@ -53,14 +53,11 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         if ($exception instanceof ValidationException) {
-            return response()->json([
-                'message' => 'Validation Failed',
-                'errors' => $exception->errors(),
-            ], 422, [
-                'Access-Control-Allow-Origin' => 'https://isohub.io', // or '*', or use $request->header('Origin')
-                'Access-Control-Allow-Methods' => 'POST, GET, OPTIONS, PUT, DELETE',
-                'Access-Control-Allow-Headers' => 'Content-Type, Authorization, X-Requested-With',
-            ]);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'errors' => $exception->errors()
+                ], 422);
+            }
         }
 
         return parent::render($request, $exception);
