@@ -39,6 +39,9 @@ Route::get('/jotform-check-unique-string/{string}', [JotFromController::class, '
 Route::post('/decrypt/cred', [SecureTracerDataController::class, 'decryptCred']);
 Route::post('/encrypt/cred', [SecureTracerDataController::class, 'encryptCred']);
 Route::post('/check-agreement', [AuthController::class, 'checkIsAgreement']);
+Route::get('/track-email-open/{form_id}', [JotFromController::class, 'trackEmailOpen']);
+Route::get('/track-form-click/{form_id}', [JotFromController::class, 'trackFormClick']);
+
 
 // Google Drive routes
 Route::get('auth/google/callback', [NewGoogleDriveController::class, 'handleGoogleCallback']);

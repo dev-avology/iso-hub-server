@@ -7,6 +7,8 @@
     <div style="max-width: 600px; margin: auto; background-color: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
         <h2 style="color: #333;">Hello {{ $data['email'] ?? '' }},</h2>
 
+       <img src="{{ url('/api/track-email-open/'.$data['form_id']) }}" width="1" height="1" style="display: none;" alt="." />
+
         <p>ISO Form Submission Link</p>
 
         <p><strong>DBA:</strong> {{ $data['dba'] }}</p>
