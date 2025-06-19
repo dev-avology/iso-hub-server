@@ -6,41 +6,42 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f8f9fa;
+            background-color: #f5f5f5;
             color: #333;
-            padding: 20px;
+            padding: 40px 20px;
         }
         .email-box {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
             max-width: 600px;
             margin: auto;
+            box-shadow: 0 0 5px rgba(0,0,0,0.05);
         }
         .email-box h2 {
-            color: #ffc107; /* Yellow */
+            color: #000;
+            font-size: 20px;
             margin-bottom: 20px;
         }
         .email-box p {
             margin: 6px 0;
+            font-size: 14px;
         }
         .highlight-link {
             font-weight: bold;
-            font-size: 16px;
-            color: #dc3545; /* red */
+            font-size: 14px;
+            color: #dc3545;
             margin-top: 20px;
         }
         .iso-link-button {
             display: inline-block;
-            margin-top: 10px;
-            background-color: #ffc107; /* Yellow */
-            color: #000;
+            margin-top: 15px;
+            background-color: #0d6efd;
+            color: white;
             padding: 10px 20px;
             border-radius: 5px;
             text-decoration: none;
-            font-weight: bold;
+            font-size: 14px;
         }
         .footer-message {
             margin-top: 40px;
