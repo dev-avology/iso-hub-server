@@ -20,7 +20,7 @@
             margin: auto;
         }
         .email-box h2 {
-            color: #0d6efd;
+            color: #ffc107; /* Yellow */
             margin-bottom: 20px;
         }
         .email-box p {
@@ -35,11 +35,12 @@
         .iso-link-button {
             display: inline-block;
             margin-top: 10px;
-            background-color: #0d6efd;
-            color: white;
+            background-color: #ffc107; /* Yellow */
+            color: #000;
             padding: 10px 20px;
             border-radius: 5px;
             text-decoration: none;
+            font-weight: bold;
         }
         .footer-message {
             margin-top: 40px;
