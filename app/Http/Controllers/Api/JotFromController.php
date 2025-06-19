@@ -16,6 +16,7 @@ use App\Models\JotForm;
 use Illuminate\Support\Facades\Auth;
 use App\Services\JotFormService;
 use App\Mail\DuplicateFormMail;
+use App\Mail\SendFormLinkMail;
 use App\Services\DashboardService;
 use App\Services\FileService;
 
@@ -397,5 +398,32 @@ class JotFromController extends Controller
 
         $hash = hash_hmac('sha256', $userId, $secret);
         return ApiResponseService::success('Token fetched successfully', $hash);
+    }
+
+    public function sendFormLinkMail(Request $request)
+    {
+        $data = [
+            'dba' => $request->dba ?? '',
+            'merchant_name' => $request->merchant_name ?? '',
+            'email' => $request->email ?? '',
+            'phone' => $request->phone ?? '',
+            'iso_form_link' => $request->iso_form_link ?? '',
+        ];
+
+        try {
+            // Send the email
+            Mail::to($request->email)->send(new SendFormLinkMail($data));
+
+            // Update the user's iso_link_status
+            $user = User::find($request->user_id);
+            if ($user) {
+                $user->iso_link_status = 1; // or 'sent', etc.
+                $user->save();
+            }
+
+            return ApiResponseService::success('Email sent successfully', []);
+        } catch (\Exception $e) {
+            return ApiResponseService::error('Failed to send email: ' . $e->getMessage(), 500);
+        }
     }
 }
