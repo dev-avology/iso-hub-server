@@ -116,7 +116,7 @@ class JotFormService
         ];
 
         if (!empty($request->form_id)) {
-            $JotFormDetailsExist = JotFormDetails::where('jot_form_id ',$request->form_id)->first();
+            $JotFormDetailsExist = JotFormDetails::where('jot_form_id',$request->form_id)->first();
             if ($JotFormDetailsExist) {
                 $detailsFind = JotFormDetails::find($JotFormDetailsExist->id);
                 $detailsFind->update($jotFormDetailsArr);
