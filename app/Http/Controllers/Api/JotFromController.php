@@ -413,6 +413,9 @@ class JotFromController extends Controller
                 'iso_form_status' => 1
             ]);
 
+            \Log::info('form1');
+            \Log::info($form);
+
             // Prepare email data
             $data = [
                 'dba' => $request->dba ?? '',
@@ -439,10 +442,14 @@ class JotFromController extends Controller
         $statusUpdated = false;
 
         if ($form && $form->iso_form_status < 3) {
+            \Log::info('inside iso_form_status < 3');
             $form->iso_form_status = 3; // Opened
             $form->save();
             $statusUpdated = true;
         }
+
+        \Log::info('form2');
+        \Log::info($form);
 
         // Prepare response as JSON part
         $jsonResponse = json_encode([
@@ -473,9 +480,14 @@ class JotFromController extends Controller
          // Decode the actual URL
         $isoUrl = base64_decode(urldecode($encodedUrl));
 
+        \Log::info('isoUrl');
+        \Log::info($isoUrl);
+        \Log::info($form);
+
         if ($form) {
             // Update status if less than 4
             if ($form->iso_form_status < 4) {
+               \Log::info('iso_form_status < 4');
                 $form->iso_form_status = 4; // Link Clicked
                 $form->save();
             }

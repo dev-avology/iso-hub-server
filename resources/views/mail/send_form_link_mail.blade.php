@@ -24,7 +24,7 @@
         @endphp
 
         <p style="margin-top: 30px;">
-            <a href="{{ url('/redirect-to-iso-form/'.$data['form_id'].'/'.$encodedUrl) }}" target="_blank" style="background-color: #1d72b8; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">View ISO Form</a>
+            <a href="{{ url('api/redirect-to-iso-form/'.$data['form_id'].'/'.$encodedUrl) }}" target="_blank" style="background-color: #1d72b8; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">View ISO Form</a>
         </p>
 
         <p style="margin-top: 40px;">Best regards,<br>
