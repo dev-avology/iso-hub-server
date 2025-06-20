@@ -102,7 +102,7 @@ class VendorTemplateController extends Controller
 
     public function getAdminVendorDropdownData(Request $request)
     {
-        $validTypes = ['processors', 'gateways', 'hardware'];
+        $validTypes = ['processors', 'gateways', 'hardware','internal'];
 
         if (!in_array($request->vendor_type, $validTypes)) {
             return ApiResponseService::error('Invalid vendor type', 404);
