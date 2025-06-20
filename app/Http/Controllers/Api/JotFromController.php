@@ -20,6 +20,8 @@ use App\Mail\SendFormLinkMail;
 use App\Services\DashboardService;
 use App\Services\FileService;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class JotFromController extends Controller
 {
@@ -413,8 +415,8 @@ class JotFromController extends Controller
                 'iso_form_status' => 1
             ]);
 
-            \Log::info('form1');
-            \Log::info($form);
+            Log::info('form1');
+            Log::info($form);
 
             // Prepare email data
             $data = [
@@ -435,41 +437,80 @@ class JotFromController extends Controller
         }
     }
 
-    public function trackEmailOpen($form_id)
+    // public function trackEmailOpen($form_id)
+    // {
+    //     $form = JotForm::find($form_id);
+
+    //     $statusUpdated = false;
+
+    //     if ($form && $form->iso_form_status < 3) {
+    //         \Log::info('inside iso_form_status < 3');
+    //         $form->iso_form_status = 3; // Opened
+    //         $form->save();
+    //         $statusUpdated = true;
+    //     }
+
+    //     \Log::info('form2');
+    //     \Log::info($form);
+
+    //     // Prepare response as JSON part
+    //     $jsonResponse = json_encode([
+    //         'success' => true,
+    //         'message' => $statusUpdated ? 'Form status updated to opened.' : 'Form already opened or not found.',
+    //         'data' => [],
+    //     ]);
+
+    //     // Transparent GIF (1x1 pixel)
+    //     $pixel = base64_decode('R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==');
+
+    //     // Combine image + JSON in multipart response (advanced) — or return just the image as below
+    //     return Response::make($pixel, 200, [
+    //         'Content-Type' => 'image/gif',
+    //         'Content-Length' => strlen($pixel),
+    //         'Cache-Control' => 'no-cache, no-store, must-revalidate',
+    //         'Pragma' => 'no-cache',
+    //         'Expires' => '0',
+    //         // Optional: expose API JSON in header (not visible in email clients)
+    //         'X-API-Response' => $jsonResponse,
+    //     ]);
+    // }
+
+    public function trackEmailOpen($form_id, Request $request)
     {
-        $form = JotForm::find($form_id);
+        $userAgent = $request->header('User-Agent');
+        $ipAddress = $request->ip();
 
-        $statusUpdated = false;
-
-        if ($form && $form->iso_form_status < 3) {
-            \Log::info('inside iso_form_status < 3');
-            $form->iso_form_status = 3; // Opened
-            $form->save();
-            $statusUpdated = true;
-        }
-
-        \Log::info('form2');
-        \Log::info($form);
-
-        // Prepare response as JSON part
-        $jsonResponse = json_encode([
-            'success' => true,
-            'message' => $statusUpdated ? 'Form status updated to opened.' : 'Form already opened or not found.',
-            'data' => [],
+        // Log every pixel hit for review
+        Log::info('Email open tracking hit', [
+            'form_id' => $form_id,
+            'ip' => $ipAddress,
+            'user_agent' => $userAgent
         ]);
 
-        // Transparent GIF (1x1 pixel)
+        // Block known prefetchers (like Gmail)
+        if (Str::contains($userAgent, ['GoogleImageProxy', 'Google', 'bot', 'crawler'])) {
+            Log::info("Likely prefetch from Gmail or bot, skipping status update.");
+        } else {
+            $form = JotForm::find($form_id);
+
+            if ($form && $form->iso_form_status < 3) {
+                Log::info('Updating form status to OPENED');
+                $form->iso_form_status = 3;
+                $form->save();
+            } else {
+                Log::info('Form already opened or not found.');
+            }
+        }
+
+        // Transparent 1x1 pixel
         $pixel = base64_decode('R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==');
 
-        // Combine image + JSON in multipart response (advanced) — or return just the image as below
         return Response::make($pixel, 200, [
             'Content-Type' => 'image/gif',
             'Content-Length' => strlen($pixel),
             'Cache-Control' => 'no-cache, no-store, must-revalidate',
             'Pragma' => 'no-cache',
             'Expires' => '0',
-            // Optional: expose API JSON in header (not visible in email clients)
-            'X-API-Response' => $jsonResponse,
         ]);
     }
 
@@ -477,17 +518,17 @@ class JotFromController extends Controller
     {
         $form = JotForm::find($form_id);
 
-         // Decode the actual URL
+        // Decode the actual URL
         $isoUrl = base64_decode(urldecode($encodedUrl));
 
-        \Log::info('isoUrl');
-        \Log::info($isoUrl);
-        \Log::info($form);
+        Log::info('isoUrl');
+        Log::info($isoUrl);
+        Log::info($form);
 
         if ($form) {
             // Update status if less than 4
             if ($form->iso_form_status < 4) {
-               \Log::info('iso_form_status < 4');
+                Log::info('iso_form_status < 4');
                 $form->iso_form_status = 4; // Link Clicked
                 $form->save();
             }
