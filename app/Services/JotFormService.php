@@ -20,8 +20,7 @@ class JotFormService
 {
     public function create($request, $user_id)
     {
-        \Log::info($request->all());
-        $form = JotForm::create([
+        $jotFormData = [
             'user_id' => $user_id ?? '',
             'first_name' => $request->first_name ?? '',
             'last_name' => $request->last_name ?? '',
@@ -72,7 +71,18 @@ class JotFormService
             'personal_guarantee_required' => $request->personal_guarantee_required ?? '',
             'clear_signature' => $request->clear_signature ?? '',
             'mail_status' => $request->mail_status ?? 0,
-        ]);
+        ];
+
+        if (!empty($request->form_id)) {
+            $form = JotForm::find($request->form_id);
+            if ($form) {
+                $form->update($jotFormData);
+            } else {
+                return response()->json(['error' => true, 'message' => 'Form not found'], 404);
+            }
+        } else {
+            $form = JotForm::create($jotFormData);
+        }
 
         $jotFormDetails = JotFormDetails::create([
             'jot_form_id' => $form->id,
@@ -175,6 +185,15 @@ class JotFormService
                     'ownership_address' => $ownerData['ownership_address'] ?? '',
                     'ownership_residential_street_address' => $ownerData['ownership_residential_street_address'] ?? '',
                 ]);
+            }
+        }
+
+        if($form){
+            $form = JotForm::find($form->id);
+            if ($form) {
+                $form->update(['iso_form_status' => 5]);
+            } else {
+                return response()->json(['error' => true, 'message' => 'Form not found'], 404);
             }
         }
 

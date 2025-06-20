@@ -11,11 +11,16 @@
 
         <p>ISO Form Submission Link</p>
 
+        @php
+            $separator = Str::contains($data['iso_form_link'], '?') ? '&' : '?';
+            $safeUrl = $data['iso_form_link'] . $separator . 'id=' . $data['form_id'];
+        @endphp
+
         <p><strong>DBA:</strong> {{ $data['dba'] }}</p>
         <p><strong>Merchant Name:</strong> {{ $data['merchant_name'] }}</p>
         <p><strong>Email:</strong> {{ $data['email'] }}</p>
         <p><strong>Phone:</strong> {{ $data['phone'] }}</p>
-        <p><strong>ISO Form URL:</strong> {{ $data['iso_form_link'] }}</p>
+        <p><strong>ISO Form URL:</strong> {{ $safeUrl  }}</p>
 
         {{-- <p>Please change your password after logging in for security purposes.</p> --}}
 
