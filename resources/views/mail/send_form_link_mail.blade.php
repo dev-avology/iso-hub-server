@@ -19,8 +19,12 @@
 
         {{-- <p>Please change your password after logging in for security purposes.</p> --}}
 
+        @php
+            $encodedUrl = urlencode(base64_encode($data['iso_form_link']));
+        @endphp
+
         <p style="margin-top: 30px;">
-            <a href="{{ $data['iso_form_link'] }}" target="_blank" style="background-color: #1d72b8; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">View ISO Form</a>
+            <a href="{{ url('/redirect-to-iso-form/'.$data['form_id'].'/'.$encodedUrl) }}" target="_blank" style="background-color: #1d72b8; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">View ISO Form</a>
         </p>
 
         <p style="margin-top: 40px;">Best regards,<br>

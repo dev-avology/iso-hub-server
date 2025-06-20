@@ -466,9 +466,12 @@ class JotFromController extends Controller
         ]);
     }
 
-    public function trackFormClick($form_id)
+    public function trackFormClick($form_id, $encodedUrl)
     {
         $form = JotForm::find($form_id);
+
+         // Decode the actual URL
+        $isoUrl = base64_decode(urldecode($encodedUrl));
 
         if ($form) {
             // Update status if less than 4
@@ -478,7 +481,7 @@ class JotFromController extends Controller
             }
 
             // Redirect to the actual ISO form link
-            return redirect()->away($form->iso_form_link);
+            return redirect()->away($isoUrl);
         }
 
         return response()->json(['error' => true, 'message' => 'Invalid form ID'], 404);

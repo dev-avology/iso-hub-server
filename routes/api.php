@@ -40,7 +40,9 @@ Route::post('/decrypt/cred', [SecureTracerDataController::class, 'decryptCred'])
 Route::post('/encrypt/cred', [SecureTracerDataController::class, 'encryptCred']);
 Route::post('/check-agreement', [AuthController::class, 'checkIsAgreement']);
 Route::get('/track-email-open/{form_id}', [JotFromController::class, 'trackEmailOpen']);
-Route::get('/track-form-click/{form_id}', [JotFromController::class, 'trackFormClick']);
+Route::get('/redirect-to-iso-form/{form_id}/{encodedUrl}', [JotFromController::class, 'trackFormClick']);
+
+
 
 
 // Google Drive routes
