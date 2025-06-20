@@ -478,31 +478,26 @@ class JotFromController extends Controller
     public function trackEmailOpen($form_id, Request $request)
     {
         $userAgent = $request->header('User-Agent');
-        $ipAddress = $request->ip();
+        $ip = $request->ip();
 
-        // Log every pixel hit for review
-        Log::info('Email open tracking hit', [
-            'form_id' => $form_id,
-            'ip' => $ipAddress,
-            'user_agent' => $userAgent
-        ]);
+        Log::info('Pixel hit:', ['form_id' => $form_id, 'user_agent' => $userAgent, 'ip' => $ip]);
 
-        // Block known prefetchers (like Gmail)
+        // ✅ Gmail ya proxy ke request ko ignore karna
         if (Str::contains($userAgent, ['GoogleImageProxy', 'Google', 'bot', 'crawler'])) {
-            Log::info("Likely prefetch from Gmail or bot, skipping status update.");
+            Log::info("Prefetch detected (Gmail or bot) => SKIPPING update.");
         } else {
+            // ✅ Yahan sirf tabhi update karega jab real user ne image load kiya ho
             $form = JotForm::find($form_id);
 
             if ($form && $form->iso_form_status < 3) {
-                Log::info('Updating form status to OPENED');
                 $form->iso_form_status = 3;
                 $form->save();
-            } else {
-                Log::info('Form already opened or not found.');
+
+                Log::info("Form status updated to 3 (opened) for form_id: $form_id");
             }
         }
 
-        // Transparent 1x1 pixel
+        // Transparent 1x1 GIF image return
         $pixel = base64_decode('R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==');
 
         return Response::make($pixel, 200, [
@@ -513,6 +508,47 @@ class JotFromController extends Controller
             'Expires' => '0',
         ]);
     }
+
+
+
+    // public function trackEmailOpen($form_id, Request $request)
+    // {
+    //     $userAgent = $request->header('User-Agent');
+    //     $ipAddress = $request->ip();
+
+    //     // Log every pixel hit for review
+    //     Log::info('Email open tracking hit', [
+    //         'form_id' => $form_id,
+    //         'ip' => $ipAddress,
+    //         'user_agent' => $userAgent
+    //     ]);
+
+    //     // Block known prefetchers (like Gmail)
+    //     if (Str::contains($userAgent, ['GoogleImageProxy', 'Google', 'bot', 'crawler'])) {
+    //         Log::info("Likely prefetch from Gmail or bot, skipping status update.");
+    //     } else {
+    //         $form = JotForm::find($form_id);
+
+    //         if ($form && $form->iso_form_status < 3) {
+    //             Log::info('Updating form status to OPENED');
+    //             $form->iso_form_status = 3;
+    //             $form->save();
+    //         } else {
+    //             Log::info('Form already opened or not found.');
+    //         }
+    //     }
+
+    //     // Transparent 1x1 pixel
+    //     $pixel = base64_decode('R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==');
+
+    //     return Response::make($pixel, 200, [
+    //         'Content-Type' => 'image/gif',
+    //         'Content-Length' => strlen($pixel),
+    //         'Cache-Control' => 'no-cache, no-store, must-revalidate',
+    //         'Pragma' => 'no-cache',
+    //         'Expires' => '0',
+    //     ]);
+    // }
 
     public function trackFormClick($form_id, $encodedUrl)
     {
