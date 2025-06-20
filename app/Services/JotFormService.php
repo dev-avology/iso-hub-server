@@ -84,7 +84,7 @@ class JotFormService
             $form = JotForm::create($jotFormData);
         }
 
-        $jotFormDetails = JotFormDetails::create([
+        $jotFormDetailsArr = [
             'jot_form_id' => $form->id,
             'dba_street_address' => $request->dba_street_address ?? '',
             'dba_street_address2' => $request->dba_street_address2 ?? '',
@@ -113,18 +113,25 @@ class JotFormService
             'business_products_sold' => $request->business_products_sold ?? '',
             'business_return_policy' => $request->business_return_policy ?? '',
             'location_description' => $request->location_description ?? '',
-        ]);
+        ];
+
+        if (!empty($request->form_id)) {
+            $JotFormDetailsExist = JotFormDetails::where('jot_form_id ',$request->form_id)->first();
+            if ($JotFormDetailsExist) {
+                $detailsFind = JotFormDetails::find($JotFormDetailsExist->id);
+                $detailsFind->update($jotFormDetailsArr);
+            } else {
+                JotFormDetails::create($jotFormDetailsArr);
+            }
+        } else {
+            JotFormDetails::create($jotFormDetailsArr);
+        }
+
+        // $jotFormDetails = JotFormDetails::create();
 
         if ($request->hasFile('bankingDocs')) {
             foreach ($request->file('bankingDocs') as $file) {
-                // $fileName = time() . '_' . $file->getClientOriginalName();
-                // $filePath = $file->storeAs('uploads/bank_docs', $fileName, 'public');
-
-                // JotFormBankDocs::create([
-                //     'jot_form_id' => $form->id,
-                //     'name' => $fileName,
-                //     'path' => 'storage/' . $filePath,
-                // ]);
+               
                 $storedPath = $file->store('uploads', 'public');
                 $original_name = $file->getClientOriginalName();
                 $images = [
