@@ -188,6 +188,15 @@ class JotFormService
             }
         }
 
+        if($form){
+            $form = JotForm::find($form->id);
+            if ($form) {
+                $form->update(['iso_form_status' => 5]);
+            } else {
+                return response()->json(['error' => true, 'message' => 'Form not found'], 404);
+            }
+        }
+
         return $form;
     }
 }
