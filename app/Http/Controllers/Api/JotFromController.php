@@ -412,7 +412,8 @@ class JotFromController extends Controller
                 'email' => $request->email ?? '',
                 'phone' => $request->phone ?? '',
                 'merchant_name' => $request->merchant_name ?? '',
-                'iso_form_status' => 1
+                'iso_form_status' => 1,
+                'business_dba' => $request->dba ?? ''
             ]);
 
             // Prepare email data
