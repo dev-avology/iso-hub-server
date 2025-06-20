@@ -3,7 +3,6 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -45,24 +44,5 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
-    }
-
-    /**
-     * Override the default exception rendering to handle CORS headers on validation errors.
-     */
-    public function render($request, Throwable $exception)
-    {
-        if ($exception instanceof ValidationException) {
-            return response()->json([
-                'message' => 'Validation Failed',
-                'errors' => $exception->errors(),
-            ], 422, [
-                'Access-Control-Allow-Origin' => 'https://isohub.io', // or '*', or use $request->header('Origin')
-                'Access-Control-Allow-Methods' => 'POST, GET, OPTIONS, PUT, DELETE',
-                'Access-Control-Allow-Headers' => 'Content-Type, Authorization, X-Requested-With',
-            ]);
-        }
-
-        return parent::render($request, $exception);
     }
 }

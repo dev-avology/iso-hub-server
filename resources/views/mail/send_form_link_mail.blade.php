@@ -7,6 +7,8 @@
     <div style="max-width: 600px; margin: auto; background-color: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
         <h2 style="color: #333;">Hello {{ $data['email'] ?? '' }},</h2>
 
+       <img src="{{ url('/api/track-email-open/'.$data['form_id']) }}" width="1" height="1" style="display: none;" alt="." />
+
         <p>ISO Form Submission Link</p>
 
         <p><strong>DBA:</strong> {{ $data['dba'] }}</p>
@@ -17,8 +19,12 @@
 
         {{-- <p>Please change your password after logging in for security purposes.</p> --}}
 
+        @php
+            $encodedUrl = urlencode(base64_encode($data['iso_form_link']));
+        @endphp
+
         <p style="margin-top: 30px;">
-            <a href="{{ $data['iso_form_link'] }}" target="_blank" style="background-color: #1d72b8; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">View ISO Form</a>
+            <a href="{{ url('/redirect-to-iso-form/'.$data['form_id'].'/'.$encodedUrl) }}" target="_blank" style="background-color: #1d72b8; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">View ISO Form</a>
         </p>
 
         <p style="margin-top: 40px;">Best regards,<br>

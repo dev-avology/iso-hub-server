@@ -19,6 +19,7 @@ use App\Mail\DuplicateFormMail;
 use App\Mail\SendFormLinkMail;
 use App\Services\DashboardService;
 use App\Services\FileService;
+use Illuminate\Support\Facades\Response;
 
 class JotFromController extends Controller
 {
@@ -402,28 +403,87 @@ class JotFromController extends Controller
 
     public function sendFormLinkMail(Request $request)
     {
-        $data = [
-            'dba' => $request->dba ?? '',
-            'merchant_name' => $request->merchant_name ?? '',
-            'email' => $request->email ?? '',
-            'phone' => $request->phone ?? '',
-            'iso_form_link' => $request->iso_form_link ?? '',
-        ];
-
         try {
-            // Send the email
-            Mail::to($request->email)->send(new SendFormLinkMail($data));
+            // Create JotForm entry
+            $form = JotForm::create([
+                'user_id' => $request->user_id ?? '',
+                'email' => $request->email ?? '',
+                'phone' => $request->phone ?? '',
+                'merchant_name' => $request->merchant_name ?? '',
+                'iso_form_status' => 1
+            ]);
 
-            // Update the user's iso_link_status
-            $user = User::find($request->user_id);
-            if ($user) {
-                $user->iso_link_status = 1; // or 'sent', etc.
-                $user->save();
-            }
+            // Prepare email data
+            $data = [
+                'dba' => $request->dba ?? '',
+                'merchant_name' => $request->merchant_name ?? '',
+                'email' => $request->email ?? '',
+                'phone' => $request->phone ?? '',
+                'iso_form_link' => $request->iso_form_link ?? '',
+                'form_id' => $form->id
+            ];
+
+            // Send email
+            Mail::to($request->email)->send(new SendFormLinkMail($data));
 
             return ApiResponseService::success('Email sent successfully', []);
         } catch (\Exception $e) {
-            return ApiResponseService::error('Failed to send email: ' . $e->getMessage(), 500);
+            return ApiResponseService::error('Failed to process request: ' . $e->getMessage(), 500);
         }
+    }
+
+    public function trackEmailOpen($form_id)
+    {
+        $form = JotForm::find($form_id);
+
+        $statusUpdated = false;
+
+        if ($form && $form->iso_form_status < 3) {
+            $form->iso_form_status = 3; // Opened
+            $form->save();
+            $statusUpdated = true;
+        }
+
+        // Prepare response as JSON part
+        $jsonResponse = json_encode([
+            'success' => true,
+            'message' => $statusUpdated ? 'Form status updated to opened.' : 'Form already opened or not found.',
+            'data' => [],
+        ]);
+
+        // Transparent GIF (1x1 pixel)
+        $pixel = base64_decode('R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==');
+
+        // Combine image + JSON in multipart response (advanced) — or return just the image as below
+        return Response::make($pixel, 200, [
+            'Content-Type' => 'image/gif',
+            'Content-Length' => strlen($pixel),
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0',
+            // Optional: expose API JSON in header (not visible in email clients)
+            'X-API-Response' => $jsonResponse,
+        ]);
+    }
+
+    public function trackFormClick($form_id, $encodedUrl)
+    {
+        $form = JotForm::find($form_id);
+
+         // Decode the actual URL
+        $isoUrl = base64_decode(urldecode($encodedUrl));
+
+        if ($form) {
+            // Update status if less than 4
+            if ($form->iso_form_status < 4) {
+                $form->iso_form_status = 4; // Link Clicked
+                $form->save();
+            }
+
+            // Redirect to the actual ISO form link
+            return redirect()->away($isoUrl);
+        }
+
+        return response()->json(['error' => true, 'message' => 'Invalid form ID'], 404);
     }
 }
