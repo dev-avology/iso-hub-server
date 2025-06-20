@@ -415,16 +415,13 @@ class JotFromController extends Controller
                 'iso_form_status' => 1
             ]);
 
-            Log::info('form1');
-            Log::info($form);
-
             // Prepare email data
             $data = [
                 'dba' => $request->dba ?? '',
                 'merchant_name' => $request->merchant_name ?? '',
                 'email' => $request->email ?? '',
                 'phone' => $request->phone ?? '',
-                'iso_form_link' => $request->iso_form_link ?? '',
+                'iso_form_link' => $request->iso_form_link. '?id='. $form->id ?? '',
                 'form_id' => $form->id
             ];
 
@@ -509,57 +506,12 @@ class JotFromController extends Controller
         ]);
     }
 
-
-
-    // public function trackEmailOpen($form_id, Request $request)
-    // {
-    //     $userAgent = $request->header('User-Agent');
-    //     $ipAddress = $request->ip();
-
-    //     // Log every pixel hit for review
-    //     Log::info('Email open tracking hit', [
-    //         'form_id' => $form_id,
-    //         'ip' => $ipAddress,
-    //         'user_agent' => $userAgent
-    //     ]);
-
-    //     // Block known prefetchers (like Gmail)
-    //     if (Str::contains($userAgent, ['GoogleImageProxy', 'Google', 'bot', 'crawler'])) {
-    //         Log::info("Likely prefetch from Gmail or bot, skipping status update.");
-    //     } else {
-    //         $form = JotForm::find($form_id);
-
-    //         if ($form && $form->iso_form_status < 3) {
-    //             Log::info('Updating form status to OPENED');
-    //             $form->iso_form_status = 3;
-    //             $form->save();
-    //         } else {
-    //             Log::info('Form already opened or not found.');
-    //         }
-    //     }
-
-    //     // Transparent 1x1 pixel
-    //     $pixel = base64_decode('R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==');
-
-    //     return Response::make($pixel, 200, [
-    //         'Content-Type' => 'image/gif',
-    //         'Content-Length' => strlen($pixel),
-    //         'Cache-Control' => 'no-cache, no-store, must-revalidate',
-    //         'Pragma' => 'no-cache',
-    //         'Expires' => '0',
-    //     ]);
-    // }
-
     public function trackFormClick($form_id, $encodedUrl)
     {
         $form = JotForm::find($form_id);
 
         // Decode the actual URL
         $isoUrl = base64_decode(urldecode($encodedUrl));
-
-        Log::info('isoUrl');
-        Log::info($isoUrl);
-        Log::info($form);
 
         if ($form) {
             // Update status if less than 4
@@ -568,7 +520,6 @@ class JotFromController extends Controller
                 $form->iso_form_status = 4; // Link Clicked
                 $form->save();
             }
-
             // Redirect to the actual ISO form link
             return redirect()->away($isoUrl);
         }
