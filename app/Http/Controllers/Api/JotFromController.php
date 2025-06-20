@@ -415,18 +415,13 @@ class JotFromController extends Controller
                 'iso_form_status' => 1
             ]);
 
-
-            $baseUrl = $request->iso_form_link;
-            $separator = Str::contains($baseUrl, '?') ? '&' : '?';
-            $fullUrl = $baseUrl . $separator . 'id=' . $form->id;
-
             // Prepare email data
             $data = [
                 'dba' => $request->dba ?? '',
                 'merchant_name' => $request->merchant_name ?? '',
                 'email' => $request->email ?? '',
                 'phone' => $request->phone ?? '',
-                'iso_form_link' => $fullUrl ?? '',
+                'iso_form_link' => $request->iso_form_link,
                 'form_id' => $form->id
             ];
 
@@ -517,7 +512,7 @@ class JotFromController extends Controller
 
         // Decode the actual URL
         $isoUrl = base64_decode(urldecode($encodedUrl));
-        Log::info("Redirecting to: " . $isoUrl); // Should show full valid URL
+        $isoFullUrl = $isoUrl.'?id='.$form_id;
 
         if ($form) {
             // Update status if less than 4
@@ -527,7 +522,7 @@ class JotFromController extends Controller
                 $form->save();
             }
             // Redirect to the actual ISO form link
-            return redirect()->away($isoUrl);
+            return redirect()->away($isoFullUrl);
         }
 
         return response()->json(['error' => true, 'message' => 'Invalid form ID'], 404);
