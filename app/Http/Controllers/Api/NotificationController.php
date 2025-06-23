@@ -58,27 +58,37 @@ class NotificationController extends Controller
         return ApiResponseService::success('All notifications deleted successfully.', []);
     }
 
-    public function sendToAllUsers(Request $request){
+    public function sendToAllUsers(Request $request)
+    {
+        try {
+            // Validate request
+            $validator = Validator::make($request->all(), [
+                'msg' => 'required|string',
+            ]);
 
-        $validator = Validator::make($request->all(), [
-            'msg' => 'required',
-        ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
 
-       // Return validation errors if any
-        
-        if ($validator->fails()) {
+            // Fetch users (you can uncomment to notify all users)
+            // $users = User::all();
+            $users = User::all();
+
+            foreach ($users as $user) {
+                $user->notify(new AdminGlobalNotification($request->msg));
+            }
+
+            return ApiResponseService::success('Notifications have been successfully sent to all users.', []);
+            
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors(),
-            ], 200);
+                'error' => true,
+                'message' => 'Failed to send notifications: ' . $e->getMessage()
+            ], 500);
         }
-        // Get all users
-        // $users = User::all();
-        $users = User::where('email', 'ashishyadav.avology@gmail.com')->get();
-        foreach ($users as $user) {
-            // Each will be queued individually
-            $user->notify(new AdminGlobalNotification($request->msg));
-        }
-        return response()->json(['message' => 'Notifications queued for all users.']);
     }
+
 }
