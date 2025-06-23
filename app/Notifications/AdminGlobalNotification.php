@@ -40,6 +40,7 @@ class AdminGlobalNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
+        ->from('no-reply@isohub.com', 'ISO HUB')
         ->subject('🎉 Happy Birthday Notification')
         ->view('mail.admin_global_notification', [
             'msg' => $this->msg,
