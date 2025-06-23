@@ -15,9 +15,9 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         // $schedule->command('files:cleanup')->daily();
         $schedule->command('files:cleanup')->everyMinute();
-        $schedule->command('app:queue-worker --sleep=3 --tries=3 --timeout=90')
-             ->everyMinute()
-             ->withoutOverlapping();
+        $schedule->command('queue:work --sleep=3 --tries=3 --timeout=90')
+        ->everyMinute()
+        ->withoutOverlapping();
     }
 
     /**
