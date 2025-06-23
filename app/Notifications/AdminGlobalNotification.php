@@ -43,9 +43,16 @@ class AdminGlobalNotification extends Notification implements ShouldQueue
         //             ->line('The introduction to the notification.')
         //             ->action('Notification Action', url('/'))
         //             ->line('Thank you for using our application!');
+        // return (new MailMessage)
+        //     ->subject('Message from Admin')
+        //     ->line($this->msg);
+
         return (new MailMessage)
-            ->subject('Message from Admin')
-            ->line($this->msg);
+        ->subject('Message from Admin')
+        ->view('emails.admin_global_notification', [
+            'msg' => $this->msg,
+            'user' => $notifiable
+        ]);    
     }
 
     /**
