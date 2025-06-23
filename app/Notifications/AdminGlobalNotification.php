@@ -49,7 +49,7 @@ class AdminGlobalNotification extends Notification implements ShouldQueue
 
         return (new MailMessage)
         ->subject('Message from Admin')
-        ->view('emails.admin_global_notification', [
+        ->view('mail.admin_global_notification', [
             'msg' => $this->msg,
             'user' => $notifiable
         ]);    
