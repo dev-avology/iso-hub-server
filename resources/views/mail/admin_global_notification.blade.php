@@ -7,7 +7,7 @@
     <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
         <div style="text-align: center;">
             <h1 style="color: #ff6b6b;">🎂 Happy Birthday!</h1>
-            <p style="font-size: 18px; color: #333;">Hello {{ $user->name ?? 'Valued User' }},</p>
+            <p style="font-size: 18px; color: #333;">Hello {{ $user->first_name ?? 'Valued User' }},</p>
         </div>
 
         <div style="margin-top: 20px; font-size: 16px; color: #555;">
