@@ -134,6 +134,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/remove-notification', [NotificationController::class, 'removeNotification']);
         Route::post('/delete-notification', [NotificationController::class, 'deleteNotification']);
         Route::post('/delete-all-notification', [NotificationController::class, 'deleteAllNotification']);
+        Route::post('/send-to-all-users-mail', [NotificationController::class, 'sendToAllUsers']);
     });
 
     Route::group(['prefix' => 'vendor'], function () {
@@ -156,7 +157,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/send-form-link-mail', [JotFromController::class, 'sendFormLinkMail']);
     Route::post('/verify-session', [UserController::class, 'verifySession']);
     Route::post('/send-credentials-mail', [SecureTracerDataController::class, 'sendCredentialsToUser']);
-
 
     // Google Drive Routes
     Route::get('/google/redirect', [NewGoogleDriveController::class, 'redirectToGoogle']);
