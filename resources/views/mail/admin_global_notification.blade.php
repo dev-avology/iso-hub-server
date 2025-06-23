@@ -11,7 +11,7 @@
         </div>
 
         <div style="margin-top: 20px; font-size: 16px; color: #555;">
-            <p>{{ $message }}</p>
+            <p>{{ $msg ?? '' }}</p>
         </div>
 
         <div style="margin-top: 30px; text-align: center;">
