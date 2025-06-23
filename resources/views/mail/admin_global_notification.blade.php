@@ -1,16 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Notification</title>
+    <title>Birthday Notification</title>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f9f9f9; padding: 20px;">
-    <div style="max-width: 600px; margin: auto; background-color: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
-        <h2 style="color: #333;">Hello {{ $user->first_name ?? '' .' '. $user->last_name ?? '' }},</h2>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 40px;">
+    <div style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+        <div style="text-align: center;">
+            <h1 style="color: #ff6b6b;">🎂 Happy Birthday!</h1>
+            <p style="font-size: 18px; color: #333;">Hello {{ $user->name ?? 'Valued User' }},</p>
+        </div>
 
-        <p>{{ $msg }}</p>
+        <div style="margin-top: 20px; font-size: 16px; color: #555;">
+            <p>{{ $message }}</p>
+        </div>
 
-        <p style="margin-top: 40px;">Best regards,<br>
-        The ISO HUB Team</p>
+        <div style="margin-top: 30px; text-align: center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/4389/4389342.png" alt="Cake" width="100" style="margin-bottom: 20px;">
+            <p style="color: #888;">Wishing you a fantastic year ahead!</p>
+        </div>
+
+        <div style="margin-top: 40px; text-align: center; font-size: 14px; color: #aaa;">
+            <p>— ISO HUB Team</p>
+        </div>
     </div>
 </body>
 </html>
