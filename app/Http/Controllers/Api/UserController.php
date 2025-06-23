@@ -84,14 +84,49 @@ class UserController extends Controller
             ]);
         }
 
+        // $validator = Validator::make($request->all(), [
+        //     'first_name' => 'required|string|max:255',
+        //     'last_name' => 'required|string|max:255',
+        //     'email' => 'required|string|email|unique:users,email',
+        //     'phone' => 'required',
+        //     'role_id' => 'required|integer|exists:roles,id', // Check if role_id exists
+        //     // 'password' => 'required',
+        //     'password' => [
+        //         'required',
+        //         'string',
+        //         'min:8',              // Minimum 8 characters
+        //         'regex:/[a-z]/',      // At least one lowercase letter
+        //         'regex:/[A-Z]/',      // At least one uppercase letter
+        //         'regex:/[0-9]/',      // At least one digit
+        //         'regex:/[@$!%*#?&]/', // At least one special character
+        //     ],
+        // ]);
+
+
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users,email',
             'phone' => 'required',
-            'role_id' => 'required|integer|exists:roles,id', // Check if role_id exists
-            'password' => 'required',
+            'role_id' => 'required|integer|exists:roles,id',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'has_lowercase',
+                'has_uppercase',
+                'has_digit',
+                'has_special',
+            ],
+        ], [
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.has_lowercase' => 'Password must contain at least one lowercase letter.',
+            'password.has_uppercase' => 'Password must contain at least one uppercase letter.',
+            'password.has_digit' => 'Password must contain at least one number.',
+            'password.has_special' => 'Password must contain at least one special character (@$!%*#?&).',
         ]);
+
+
 
        // Return validation errors if any
         
