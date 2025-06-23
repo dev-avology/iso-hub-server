@@ -15,6 +15,9 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         // $schedule->command('files:cleanup')->daily();
         $schedule->command('files:cleanup')->everyMinute();
+        $schedule->command('app:queue-worker --sleep=3 --tries=3 --timeout=90')
+             ->everyMinute()
+             ->withoutOverlapping();
     }
 
     /**
@@ -24,6 +27,7 @@ class Kernel extends ConsoleKernel
     {
         $this->load(__DIR__.'/Commands');
 
+        // \App\Console\Commands\QueueWorkerCommand::class;
         require base_path('routes/console.php');
     }
 }
