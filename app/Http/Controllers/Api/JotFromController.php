@@ -123,9 +123,9 @@ class JotFromController extends Controller
         $message = 'new Pre-Application.';
 
         $form = $this->JotFormService->create($request, $user_id);
-        if ($form) {
-            $this->FileService->notifyUser($user_id, $message);
-        }
+        // if ($form) {
+        //     $this->FileService->notifyUser($user_id, $message);
+        // }
         return ApiResponseService::success('Forms Created Successfully', $form);
     }
 
@@ -174,6 +174,62 @@ class JotFromController extends Controller
         }
     }
 
+    // public function getFormsList(Request $request)
+    // {
+    //     $permission = 'jotform.view';
+    //     $userPermission = $this->DashboardService->checkPermission($permission);
+
+    //     if (!empty($userPermission)) {
+    //         return $userPermission;
+    //     }
+
+    //     $authUser = auth()->user();
+    //     $query = JotForm::query();
+
+    //     if ($request->filled('user_id')) {
+    //         if ($authUser->role_id != 1) {
+    //           $query->where('created_by_id', $request->user_id);
+    //         }
+    //         // $query->where('user_id', $request->user_id);
+    //     }
+
+    //     $jotforms = $query->with(['get_jotform_details', 'get_jotform_docs', 'get_jotform_owner_docs'])->orderBy('created_at', 'desc')->get();
+    //     return ApiResponseService::success('Jotfrom lists fetched successfully', $jotforms);
+    // }
+
+    // public function getFormsList(Request $request)
+    // {
+    //     $permission = 'jotform.view';
+    //     $userPermission = $this->DashboardService->checkPermission($permission);
+
+    //     if (!empty($userPermission)) {
+    //         return $userPermission;
+    //     }
+
+    //     $authUser = auth()->user();
+    //     $query = JotForm::query();
+
+    //     if ($authUser->role_id === 1) {
+    //         // Superadmin - get all
+    //     } else {
+    //         // Get all direct children of the user
+    //         $childUserIds = User::where('created_by_id', $authUser->id)->pluck('id')->toArray();
+
+    //         $query->where(function ($q) use ($authUser, $childUserIds) {
+    //             $q->where('user_id', $authUser->id) // Own forms
+    //             ->orWhere('created_by_id', $authUser->id) // Forms created by children for parent
+    //             ->orWhereIn('user_id', $childUserIds); // Children’s own forms
+    //         });
+    //     }
+
+    //     $jotforms = $query
+    //         ->with(['get_jotform_details', 'get_jotform_docs', 'get_jotform_owner_docs'])
+    //         ->orderBy('created_at', 'desc')
+    //         ->get();
+
+    //     return ApiResponseService::success('Jotform list fetched successfully', $jotforms);
+    // }
+
     public function getFormsList(Request $request)
     {
         $permission = 'jotform.view';
@@ -183,14 +239,48 @@ class JotFromController extends Controller
             return $userPermission;
         }
 
+        $authUser = auth()->user();
         $query = JotForm::query();
 
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
+        if ($authUser->role_id === 1) {
+            // Superadmin - get all forms
+        } else {
+            // Get all recursive children
+            $allChildUserIds = $this->getAllChildUserIds($authUser->id);
+
+            $query->where(function ($q) use ($authUser, $allChildUserIds) {
+                $q->where('user_id', $authUser->id)                     // Own forms
+                ->orWhere('created_by_id', $authUser->id)            // Forms created for parent
+                ->orWhereIn('user_id', $allChildUserIds)             // Forms of all children
+                ->orWhereIn('created_by_id', $allChildUserIds);      // Forms created by all children
+            });
         }
-        $jotforms = $query->with(['get_jotform_details', 'get_jotform_docs', 'get_jotform_owner_docs'])->orderBy('created_at', 'desc')->get();
-        return ApiResponseService::success('Jotfrom lists fetched successfully', $jotforms);
+
+        $jotforms = $query
+            ->with(['get_jotform_details', 'get_jotform_docs', 'get_jotform_owner_docs'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return ApiResponseService::success('Jotform list fetched successfully', $jotforms);
     }
+
+
+    private function getAllChildUserIds($parentId)
+    {
+        $allChildIds = [];
+
+        $directChildren = User::where('created_by_id', $parentId)->pluck('id')->toArray();
+
+        foreach ($directChildren as $childId) {
+            $allChildIds[] = $childId;
+            $allChildIds = array_merge($allChildIds, $this->getAllChildUserIds($childId));
+        }
+
+        return $allChildIds;
+    }
+
+
+
 
     // public function getFromDetails($id)
     // {

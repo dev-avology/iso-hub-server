@@ -29,9 +29,10 @@ class UserService
 
     public function addUser($request)
     {
-        \Log::info($request->all());
+        $auth_id = Auth::user()->id;
         // Create the user
         $user = User::create([
+            'created_by_id' => $auth_id,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
             'email' => $request->email,

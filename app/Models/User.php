@@ -34,7 +34,8 @@ class User extends Authenticatable
         'onedrive_access_token',
         'onedrive_refresh_token',
         'notify_count',
-        'birthday'
+        'birthday',
+        'created_by_id'
     ];
 
     /**
@@ -62,4 +63,17 @@ class User extends Authenticatable
     {
         return $this->belongsTo(\Spatie\Permission\Models\Role::class, 'role_id');
     }
+
+    // Users created by this user
+    public function createdUsers()
+    {
+        return $this->hasMany(User::class, 'created_by_id');
+    }
+
+    // The user who created this user
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by_id');
+    }
+
 }

@@ -15,13 +15,21 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Models\User;
 
 class JotFormService
 {
     public function create($request, $user_id)
     {
+        $user = User::find($user_id);
+        $created_by_id = null;
+        if($user){
+           $created_by_id = $user->created_by_id;
+        }
+        
         $jotFormData = [
             'user_id' => $user_id ?? '',
+            'created_by_id' => $created_by_id,
             'first_name' => $request->first_name ?? '',
             'last_name' => $request->last_name ?? '',
             // 'email' => $request->email ?? '',
