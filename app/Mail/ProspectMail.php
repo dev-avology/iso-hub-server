@@ -39,7 +39,7 @@ class ProspectMail extends Mailable
     public function build()
     {
         return $this->from(env('MAIL_FROM_ADDRESS'))
-            ->subject('Upload files on ISO HUB')
+            ->subject('Upload files on CoCard')
             ->view('mail.prospect')
             // ->with('secureUploadLink', $this->encryptedLink);
             ->with([

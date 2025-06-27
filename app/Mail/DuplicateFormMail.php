@@ -31,7 +31,7 @@ class DuplicateFormMail extends Mailable
     public function build()
     {
         return $this->from(env('MAIL_FROM_ADDRESS'))
-            ->subject('Replicated prospect form on ISO HUB')
+            ->subject('Replicated prospect form on CoCard')
             ->view('mail.duplicate_prospect_form')
             ->with([
                 'secureUploadLink' => $this->encryptedLink,

@@ -20,7 +20,7 @@
         </div>
 
         <div style="margin-top: 40px; text-align: center; font-size: 14px; color: #aaa;">
-            <p>— ISO HUB Team</p>
+            <p>— CoCard Team</p>
         </div>
     </div>
 </body>
