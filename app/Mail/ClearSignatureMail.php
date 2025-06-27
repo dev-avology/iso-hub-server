@@ -30,7 +30,7 @@ class ClearSignatureMail extends Mailable
     public function build()
     {
         return $this->from(env('MAIL_FROM_ADDRESS'))
-            ->subject('Clear Signature, Upload Docs on ISO HUB')
+            ->subject('Clear Signature, Upload Docs on CoCard')
             ->view('mail.clear_signature')
             // ->with('secureUploadLink', $this->encryptedLink);
             ->with([
