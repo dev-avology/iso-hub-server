@@ -158,21 +158,60 @@ class FileController extends Controller
         return ApiResponseService::success('Files list fetched successfully', $files);
     }
 
+    // public function getUserFiles($id)
+    // {
+    //     $authUser = Auth::user();
+
+    //     // If not Super Admin and trying to access someone else's files
+    //     if ($authUser->role_id !== 1 && $id != $authUser->id) {
+    //         return ApiResponseService::error('Unauthorized user.', 401);
+    //     }
+
+    //     $files = UploadFiles::where(function ($query) {
+    //     $query->whereNull('form_id')
+    //           ->orWhere('form_id', '');
+    //     })
+    //     ->when($authUser->role_id !== 1, function ($query) use ($id) {
+    //         $query->where('user_id', $id);
+    //     })
+    //     ->orderBy('created_at', 'desc')
+    //     ->get();
+
+    //     return ApiResponseService::success('Files list fetched successfully', $files);
+    // }
+
     public function getUserFiles($id)
     {
         $authUser = Auth::user();
 
-        // If not Super Admin and trying to access someone else's files
-        if ($authUser->role_id !== 1 && $id != $authUser->id) {
-            return ApiResponseService::error('Unauthorized user.', 401);
+        // If Super Admin, show all files (excluding form-specific)
+        if ($authUser->role_id === 1) {
+            \Log::info('Super admin');
+            $files = UploadFiles::where(function ($query) {
+                $query->whereNull('form_id')
+                    ->orWhere('form_id', '');
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+            return ApiResponseService::success('Files list fetched successfully', $files);
         }
 
-        $files = UploadFiles::where(function ($query) {
-        $query->whereNull('form_id')
-              ->orWhere('form_id', '');
-        })
-        ->when($authUser->role_id !== 1, function ($query) use ($id) {
-            $query->where('user_id', $id);
+        // Non-superadmin - get all recursive children
+        $allChildUserIds = $this->getAllChildUserIds($authUser->id);    
+
+        // Show files:
+        // - where user_id is self
+        // - OR user_id is any child
+        // - OR created_by_id is self or any child (i.e., files uploaded for them)
+        $files = UploadFiles::where(function ($query) use ($authUser, $allChildUserIds) {
+            $query->whereNull('form_id')
+                ->orWhere('form_id', '');
+        })->where(function ($query) use ($authUser, $allChildUserIds) {
+            $query->where('user_id', $authUser->id)
+                ->orWhereIn('user_id', $allChildUserIds)
+                ->orWhere('created_by_id', $authUser->id)
+                ->orWhereIn('created_by_id', $allChildUserIds);
         })
         ->orderBy('created_at', 'desc')
         ->get();
@@ -180,6 +219,19 @@ class FileController extends Controller
         return ApiResponseService::success('Files list fetched successfully', $files);
     }
 
+    private function getAllChildUserIds($parentId)
+    {
+        $allChildIds = [];
+
+        $directChildren = User::where('created_by_id', $parentId)->pluck('id')->toArray();
+
+        foreach ($directChildren as $childId) {
+            $allChildIds[] = $childId;
+            $allChildIds = array_merge($allChildIds, $this->getAllChildUserIds($childId));
+        }
+
+        return $allChildIds;
+    }
 
     public function destroyFile($id)
     {
@@ -249,7 +301,7 @@ class FileController extends Controller
         }
     }
 
-      public function checkUniqueStringForUser($string)
+    public function checkUniqueStringForUser($string)
     {
         // Check if the string is provided
         if (!$string) {

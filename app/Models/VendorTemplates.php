@@ -25,6 +25,7 @@ class VendorTemplates extends Model
         'support_info',
         'description',
         'card_order',
+        'created_by_id'
     ];
 
     public function vendor_user(): BelongsTo

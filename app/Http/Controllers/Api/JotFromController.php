@@ -123,9 +123,9 @@ class JotFromController extends Controller
         $message = 'new Pre-Application.';
 
         $form = $this->JotFormService->create($request, $user_id);
-        // if ($form) {
-        //     $this->FileService->notifyUser($user_id, $message);
-        // }
+        if ($form) {
+            $this->FileService->notifyUser($user_id, $message);
+        }
         return ApiResponseService::success('Forms Created Successfully', $form);
     }
 
