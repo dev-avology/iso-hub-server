@@ -404,6 +404,47 @@ class UserController extends Controller
         return ApiResponseService::success('User permissions fetched successfully', $data);
     }
 
+    // public function getUsers(Request $request)
+    // {
+    //     $permission = 'user.view';
+    //     $userPermission = $this->DashboardService->checkPermission($permission);
+
+    //     if (!empty($userPermission)) {
+    //         return $userPermission;
+    //     }
+
+    //     $authUser = auth()->user();
+    //     $query = User::query();
+        
+    //     // Only non-admins should be filtered by created_by_id
+    //     // if ($authUser->role_id != 1) {
+    //     //     $query->where('created_by_id', $authUser->id);
+    //     // }
+
+    //     if ($authUser->role_id !== 1) {
+    //     // Get direct children
+    //         $childUserIds = User::where('created_by_id', $authUser->id)->pluck('id')->toArray();
+
+    //         // Include logged-in user and direct children (like Ricky)
+    //         $query->where(function ($q) use ($authUser, $childUserIds) {
+    //             $q->where('id', $authUser->id)
+    //             ->orWhereIn('id', $childUserIds);
+    //         });
+    //     }
+
+    //     // if ($request->user_id) {
+    //     //     $query->where('id', $request->user_id);
+    //     // }
+
+    //     if ($request->role_id) {
+    //         $query->where('role_id', $request->role_id);
+    //     }
+    //     $users = $query->get();
+    //     \Log::info('$users');
+    //     \Log::info($users);
+    //     return ApiResponseService::success('User lists fetched successfully', $users);
+    // }
+
     public function getUsers(Request $request)
     {
         $permission = 'user.view';
@@ -413,17 +454,41 @@ class UserController extends Controller
             return $userPermission;
         }
 
+        $authUser = auth()->user();
         $query = User::query();
 
-        if ($request->user_id) {
-            $query->where('id', $request->user_id);
+        if ($authUser->role_id !== 1) {
+            $childUserIds = $this->getAllChildUserIds($authUser->id);
+
+            // Include self + all descendants (Ricky, etc.)
+            $query->whereIn('id', $childUserIds);
         }
 
         if ($request->role_id) {
             $query->where('role_id', $request->role_id);
         }
+
         $users = $query->get();
-        return ApiResponseService::success('User lists fetched successfully', $users);
+
+        \Log::info('Recursive user list:');
+        \Log::info($users);
+
+        return ApiResponseService::success('User list fetched successfully', $users);
+    }
+
+
+    private function getAllChildUserIds($parentId)
+    {
+        $allChildIds = [];
+
+        $directChildren = User::where('created_by_id', $parentId)->pluck('id')->toArray();
+        
+        foreach ($directChildren as $childId) {
+            $allChildIds[] = $childId;
+            $allChildIds = array_merge($allChildIds, $this->getAllChildUserIds($childId));
+        }
+
+        return $allChildIds;
     }
 
     public function getTeamMembersList(Request $request)

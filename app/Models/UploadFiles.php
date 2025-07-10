@@ -11,6 +11,7 @@ class UploadFiles extends Model
     protected $table = 'uploaded_files';
     protected $fillable = [
         'user_id',
+        'created_by_id',
         'form_id',
         'file_path',
         'prospect_name',

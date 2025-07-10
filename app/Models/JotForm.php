@@ -62,6 +62,7 @@ class JotForm extends Model
         'personal_guarantee_required',
         'clear_signature',
         'mail_status',
+        'created_by_id'
     ];
 
     protected $hidden = [

@@ -106,7 +106,7 @@ class SecureTracerDataController  extends Controller
         }
 
         // Check if the user has role_id 1 (Admin) or 2 (Manager)
-        if (!in_array($user->role_id, [1, 2])) {
+        if (!in_array($user->role_id, [1, 2, 3, 4, 5])) {
             return response()->json([
                 'error' => true,
                 'message' => 'You do not have permission to perform this action.',

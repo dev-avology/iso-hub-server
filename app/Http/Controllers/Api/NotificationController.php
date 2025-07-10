@@ -23,11 +23,98 @@ class NotificationController extends Controller
         $data = [
             'count' => $user->notify_count,
             'user_notifications' => Notification::where('user_id', $user_id)->orderBy('created_at', 'desc')->get(),
-            'admin_notifications' => Notification::orderBy('created_at', 'desc')->get(), // Corrected here
+            'admin_notifications' => Notification::where('user_id', $user_id)->orderBy('created_at', 'desc')->get(), // Corrected here
             'status' => 'success'
         ];
         return response()->json($data);
     }
+
+    // public function getUserNoticationCount($user_id)
+    // {
+    //     $user = User::find((int)$user_id);
+
+    //     if (!$user) {
+    //         return response()->json(['error' => 'User not found'], 404);
+    //     }
+
+    //     // Superadmin: return ALL notifications
+    //     if ($user->role_id == 1) {
+    //         return response()->json([
+    //             'count' => Notification::count(),
+    //             'user_notifications' => Notification::orderBy('created_at', 'desc')->get(),
+    //             'status' => 'success'
+    //         ]);
+    //     }
+
+    //     // 🔁 Get user and all their recursive parents (via created_by_id)
+    //     $parentUsers = $this->getAllRecursiveParents($user);
+    //     $allUserIds = collect($parentUsers)->pluck('id')->push($user->id)->unique();
+
+    //     // 📥 Get all notifications for this user + their parent chain
+    //     $notifications = Notification::whereIn('user_id', $allUserIds)
+    //                         ->orderBy('created_at', 'desc')
+    //                         ->get();
+
+    //     // 📊 Get total notify count sum for this user + parents
+    //     $notifyCount = User::whereIn('id', $allUserIds)->sum('notify_count');
+
+    //     return response()->json([
+    //         'count' => $notifyCount,
+    //         'user_notifications' => $notifications,
+    //         'status' => 'success'
+    //     ]);
+    // }
+
+    // public function getUserNoticationCount($user_id)
+    // {
+    //     $user = User::find((int)$user_id);
+
+    //     if (!$user) {
+    //         return response()->json(['error' => 'User not found'], 404);
+    //     }
+
+    //     // Superadmin: return ALL notifications
+    //     if ($user->role_id == 1) {
+    //         return response()->json([
+    //             'count' => Notification::count(),
+    //             'admin_notifications' => Notification::orderBy('created_at', 'desc')->get(),
+    //             'status' => 'success'
+    //         ]);
+    //     }
+
+    //     // ✅ Get user and all their recursive children
+    //     $childUserIds = $this->getAllRecursiveChildren($user->id);
+    //     $allUserIds = collect($childUserIds)->push($user->id)->unique();
+
+    //     // ✅ Fetch notifications for self + all children
+    //     $notifications = Notification::whereIn('user_id', $allUserIds)
+    //                         ->orderBy('created_at', 'desc')
+    //                         ->get();
+
+    //     // ✅ Count total notify_count for self + all children
+    //     $notifyCount = User::whereIn('id', $allUserIds)->sum('notify_count');
+
+    //     return response()->json([
+    //         'count' => $notifyCount,
+    //         'admin_notifications' => $notifications,
+    //         'status' => 'success'
+    //     ]);
+    // }
+
+    private function getAllRecursiveChildren($userId)
+    {
+        $allChildIds = [];
+
+        $directChildren = User::where('created_by_id', $userId)->pluck('id')->toArray();
+
+        foreach ($directChildren as $childId) {
+            $allChildIds[] = $childId;
+            $allChildIds = array_merge($allChildIds, $this->getAllRecursiveChildren($childId));
+        }
+
+        return $allChildIds;
+    }
+
 
     public function removeNotification(Request $request)
     {

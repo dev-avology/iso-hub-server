@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Services\ApiResponseService; // Import API response service
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class VendorTemplateController extends Controller
 {
@@ -47,8 +49,15 @@ class VendorTemplateController extends Controller
                 $logoPath = $file->store('vendor_logos', 'public');
             }
 
+            $user = User::find($vendor['user_id']);
+            $created_by_id = null;
+            if($user){
+             $created_by_id = $user->created_by_id;
+            }
+
             $data = [
                 'user_id' => $vendor['user_id'] ?? null,
+                'created_by_id' => $created_by_id,
                 'vendor_type' => $vendor['vendor_type'] ?? null,
                 'vendor_name' => $vendorName,
                 'vendor_email' => $vendor['vendor_email'] ?? null,
@@ -92,7 +101,22 @@ class VendorTemplateController extends Controller
             ], 422);
         }
 
-        $vendor_template = VendorTemplates::with('vendor_user')->where('vendor_name', $request->vendor_name)->where('vendor_type', $request->vendor_type)->where('user_id', $request->user_id)->first();
+        $auth = auth()->user();
+
+        $user = User::find($auth->id);
+
+        if (!$user) {
+            Log::warning('User not found', ['user_id' => $request->user_id]);
+            return ApiResponseService::error('User not found', [], 404);
+        }
+
+        $superadmin = User::where('role_id',1)->first();
+        $superadmin_id = '';
+        if($superadmin){
+            $superadmin_id = $superadmin->id;
+        }
+
+        $vendor_template = VendorTemplates::with('vendor_user')->where('vendor_name', $request->vendor_name)->where('vendor_type', $request->vendor_type)->whereIn('user_id', [$superadmin_id,$auth->id])->first();
 
         if (!$vendor_template) {
             return ApiResponseService::error('Template not found', 404);
@@ -108,33 +132,112 @@ class VendorTemplateController extends Controller
             return ApiResponseService::error('Invalid vendor type', 404);
         }
 
+        $auth = auth()->user();
+
+        $user = User::find($auth->id);
+
+        if (!$user) {
+            Log::warning('User not found', ['user_id' => $request->user_id]);
+            return ApiResponseService::error('User not found', [], 404);
+        }
+
+        $superadmin = User::where('role_id',1)->first();
+        $superadmin_id = '';
+        if($superadmin){
+            $superadmin_id = $superadmin->id;
+        }
+
         $vendors = VendorTemplates::where('vendor_type', $request->vendor_type)
-            ->where('user_id', 2)
+            ->whereIn('user_id', [$superadmin_id,$user->id])
             ->get();
 
         return ApiResponseService::success('Template fetched successfully', $vendors);
     }
 
+    // public function getAllVendorsList(Request $request)
+    // {
+    //     $query = VendorTemplates::query();
+
+    //     // if ($request->has('user_id')) {
+    //     //     $query->where('user_id', $request->user_id);
+    //     // }
+
+    //     if ($request->has('user_id')) {
+    //         $userIds = [$request->user_id, 2]; // Include requested user and user ID 2
+    //         $query->whereIn('user_id', $userIds);
+    //     }
+
+    //     // $vendors = $query->orderBy('card_order','asc')->get();
+    //     // Get vendors grouped and sorted per user to preserve correct card_order
+    //     $vendors = $query->get()->groupBy('user_id')->flatMap(function ($userGroup) {
+    //         return $userGroup->sortBy('card_order');
+    //     });
+
+    //     // Group vendors by type    
+    //     $categorizedVendors = $vendors->groupBy('vendor_type')->map(function ($group) {
+    //         return $group->map(function ($vendor) {
+    //             return [
+    //                 'id' => $vendor->id,
+    //                 'vendor_name' => $vendor->vendor_name,
+    //                 'vendor_email' => $vendor->vendor_email,
+    //                 'vendor_phone' => $vendor->vendor_phone,
+    //                 'logo_url' => $vendor->logo_url,
+    //                 'login_url' => $vendor->login_url,
+    //                 'rep_name' => $vendor->rep_name,
+    //                 'rep_email' => $vendor->rep_email,
+    //                 'rep_phone' => $vendor->rep_phone,
+    //                 'notes' => $vendor->notes,
+    //                 'support_info' => $vendor->support_info,
+    //                 'description' => $vendor->description,
+    //                 'vendor_type' => $vendor->vendor_type,
+    //                 'created_at' => $vendor->created_at,
+    //                 'updated_at' => $vendor->updated_at
+    //             ];
+    //         });
+    //     });
+
+    //     return ApiResponseService::success('Vendors fetched successfully', $categorizedVendors);
+    // }
+
     public function getAllVendorsList(Request $request)
     {
-        $query = VendorTemplates::query();
+        Log::debug('getAllVendorsList called', ['request' => $request->all()]);
 
-        // if ($request->has('user_id')) {
-        //     $query->where('user_id', $request->user_id);
-        // }
+        $auth = auth()->user();
 
-        if ($request->has('user_id')) {
-            $userIds = [$request->user_id, 2]; // Include requested user and user ID 2
-            $query->whereIn('user_id', $userIds);
+        $user = User::find($auth->id);
+
+        if (!$user) {
+            Log::warning('User not found', ['user_id' => $request->user_id]);
+            return ApiResponseService::error('User not found', [], 404);
         }
 
-        // $vendors = $query->orderBy('card_order','asc')->get();
-        // Get vendors grouped and sorted per user to preserve correct card_order
-        $vendors = $query->get()->groupBy('user_id')->flatMap(function ($userGroup) {
+        Log::debug('User found', ['user_id' => $user->id, 'role_id' => $user->role_id]);
+
+        $query = VendorTemplates::query();
+
+        $superadmin = User::where('role_id',1)->first();
+        $superadmin_id = '';
+        if($superadmin){
+            $superadmin_id = $superadmin->id;
+        }
+
+        if ($user->role_id == 1) {
+            Log::debug('Role is super admin, fetching all vendors');
+        } elseif ($user->role_id == 2) {
+            $query->whereIn('user_id', [$superadmin_id, $user->id]);
+        } else {
+            $query->whereIn('user_id', [$superadmin_id, $user->created_by_id]);
+        }
+
+        $vendorsRaw = $query->get();
+
+        // Group and sort by card_order
+        $vendors = $vendorsRaw->groupBy('user_id')->flatMap(function ($userGroup) {
             return $userGroup->sortBy('card_order');
         });
 
-        // Group vendors by type    
+        // Group by vendor_type and map the fields
         $categorizedVendors = $vendors->groupBy('vendor_type')->map(function ($group) {
             return $group->map(function ($vendor) {
                 return [
@@ -159,6 +262,8 @@ class VendorTemplateController extends Controller
 
         return ApiResponseService::success('Vendors fetched successfully', $categorizedVendors);
     }
+
+
 
     public function updateVendor(Request $request)
     {
