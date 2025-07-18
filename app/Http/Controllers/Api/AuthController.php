@@ -83,6 +83,8 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        \Log::info('$request');
+        \Log::info($request->all());
         // Use Validator for detailed error handling
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -99,6 +101,9 @@ class AuthController extends Controller
 
         // Find user by email
         $user = User::where('email', $request->email)->first();
+
+        \Log::info('$user');
+        \Log::info($user);
 
         // Check if user exists and password is correct
         if(!$request->has('is_iso_user')){
