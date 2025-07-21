@@ -33,12 +33,12 @@ class VendorTemplateController extends Controller
             }
 
             // Check for uniqueness
-            $existingVendor = VendorTemplates::where('vendor_name', $vendorName)->first();
+            // $existingVendor = VendorTemplates::where('vendor_name', $vendorName)->first();
 
-            if ($existingVendor) {
-                $errors[] = "Vendor name '{$vendorName}' already exists at index $index.";
-                continue;
-            }
+            // if ($existingVendor) {
+            //     $errors[] = "Vendor name '{$vendorName}' already exists at index $index.";
+            //     continue;
+            // }
 
             $logoPath = null;
 
