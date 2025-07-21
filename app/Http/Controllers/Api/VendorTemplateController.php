@@ -118,6 +118,10 @@ class VendorTemplateController extends Controller
     public function getAllVendorsList(Request $request)
     {
         $query = VendorTemplates::query();
+        // Include records where 'deleted_from_home' is NULL or 0
+        $query->where(function ($q) {
+            $q->where('deleted_from_home', 0);
+        });
 
         // if ($request->has('user_id')) {
         //     $query->where('user_id', $request->user_id);
@@ -233,10 +237,18 @@ class VendorTemplateController extends Controller
         return ApiResponseService::success('Vendor details fetched successfully', $vendor);
     }
 
-    public function deleteVendor(Request $request){
-       $vendor_template = VendorTemplates::find($request->id);
-       $vendor_template->delete();
-       return ApiResponseService::success('Vendor deleted successfully', $vendor_template);
+    public function deleteVendor(Request $request)
+    {
+        $vendor_template = VendorTemplates::find($request->id);
+
+        if (!$vendor_template) {
+            return ApiResponseService::error('Vendor not found', 404);
+        }
+
+        $vendor_template->deleted_from_home = 1;
+        $vendor_template->save();
+
+        return ApiResponseService::success('Vendor deleted successfully', $vendor_template);
     }
 
     public function updateCardOrder(Request $request)
