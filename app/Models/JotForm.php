@@ -62,6 +62,12 @@ class JotForm extends Model
         'personal_guarantee_required',
         'clear_signature',
         'mail_status',
+
+        'shipping_street_address',
+        'shipping_street_address2',
+        'shipping_city',
+        'shipping_state',
+        'shipping_zip'
     ];
 
     protected $hidden = [
