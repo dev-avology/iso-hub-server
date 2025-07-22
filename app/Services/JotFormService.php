@@ -20,6 +20,7 @@ class JotFormService
 {
     public function create($request, $user_id)
     {
+        // \Log::info($request->all());
         $jotFormData = [
             'user_id' => $user_id ?? '',
             'first_name' => $request->first_name ?? '',
@@ -35,6 +36,11 @@ class JotFormService
             'state' => $request->state ?? '',
             'pincode' => $request->pincode ?? '',
             'is_same_shipping_address' => $request->is_same_shipping_address ?? '0',
+            'shipping_street_address' => $request->shipping_street_address ?? '',
+            'shipping_street_address2' => $request->shipping_street_address2 ?? '',
+            'shipping_city' => $request->shipping_city ?? '',
+            'shipping_state' => $request->shipping_state ?? '',
+            'shipping_zip' => $request->shipping_zip ?? '',
             'is_duplicate' => $request->is_duplicate ?? '0',
             'business_dba' => $request->business_dba ?? '',
             'business_corporate_legal_name' => $request->business_corporate_legal_name ?? '',
