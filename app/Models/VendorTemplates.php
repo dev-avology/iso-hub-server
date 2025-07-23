@@ -25,7 +25,8 @@ class VendorTemplates extends Model
         'support_info',
         'description',
         'card_order',
-        'deleted_from_home'
+        'deleted_from_home',
+        'is_dropdown_show'
     ];
 
     public function vendor_user(): BelongsTo

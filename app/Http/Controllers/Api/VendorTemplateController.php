@@ -33,12 +33,22 @@ class VendorTemplateController extends Controller
             }
 
             // Check for uniqueness
-            // $existingVendor = VendorTemplates::where('vendor_name', $vendorName)->first();
+            $existingVendor = VendorTemplates::where('vendor_name', $vendorName)->where('deleted_from_home', 0)->first();
 
-            // if ($existingVendor) {
-            //     $errors[] = "Vendor name '{$vendorName}' already exists at index $index.";
-            //     continue;
-            // }
+            if ($existingVendor) {
+                $errors[] = "Vendor name '{$vendorName}' already exists at index $index.";
+                continue;
+            }
+
+            $is_dropdown = VendorTemplates::where('vendor_name', $vendorName)->where('is_dropdown_show',1)->first();
+
+            $is_dropdown_show = 0;
+
+            if(isset($is_dropdown) && !empty($is_dropdown)){
+                $is_dropdown_show = 0;
+            }else{
+                $is_dropdown_show = 1;
+            }
 
             $logoPath = null;
 
@@ -61,6 +71,7 @@ class VendorTemplateController extends Controller
                 'rep_email' => $vendor['rep_email'] ?? null,
                 'rep_phone' => $vendor['rep_phone'] ?? null,
                 'description' => $vendor['description'] ?? null,
+                'is_dropdown_show' => $is_dropdown_show
             ];
 
             VendorTemplates::create($data);
@@ -82,6 +93,7 @@ class VendorTemplateController extends Controller
             'vendor_name' => 'required',
             'vendor_type' => 'required',
             'user_id' => 'required|exists:users,id',
+            'vendor_id' => 'required'
         ]);
 
         // Return validation errors if any
@@ -92,7 +104,7 @@ class VendorTemplateController extends Controller
             ], 422);
         }
 
-        $vendor_template = VendorTemplates::with('vendor_user')->where('vendor_name', $request->vendor_name)->where('vendor_type', $request->vendor_type)->where('user_id', $request->user_id)->first();
+        $vendor_template = VendorTemplates::with('vendor_user')->where('vendor_name', $request->vendor_name)->where('vendor_type', $request->vendor_type)->where('user_id', $request->user_id)->where('id', $request->vendor_id)->first();
 
         if (!$vendor_template) {
             return ApiResponseService::error('Template not found', 404);
@@ -110,6 +122,9 @@ class VendorTemplateController extends Controller
 
         $vendors = VendorTemplates::where('vendor_type', $request->vendor_type)
             ->where('user_id', 2)
+            ->where('is_dropdown_show', 1)
+            ->select('vendor_name','id')
+            ->distinct()
             ->get();
 
         return ApiResponseService::success('Template fetched successfully', $vendors);
@@ -166,11 +181,16 @@ class VendorTemplateController extends Controller
 
     public function updateVendor(Request $request)
     {
+        \Log::info($request->all());
+        \Log::info('this is vendor request');
+
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:vendor_templates,id',
             'vendor_name' => [
                 'required',
-                Rule::unique('vendor_templates', 'vendor_name')->ignore($request->id),
+                Rule::unique('vendor_templates', 'vendor_name')
+                    ->ignore($request->id)
+                    ->where(fn($q) => $q->where('deleted_from_home', 0)),
             ],
             // 'vendor_email' => 'required|email',
             // 'vendor_phone' => 'required',
