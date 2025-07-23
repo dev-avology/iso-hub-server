@@ -14,6 +14,76 @@ use Illuminate\Validation\Rule;
 
 class VendorTemplateController extends Controller
 {
+    // public function storeVendorTemplates(Request $request)
+    // {
+    //     $vendors = json_decode($request->input('vendors'), true);
+
+    //     if (!is_array($vendors)) {
+    //         return response()->json(['error' => 'Invalid vendors data'], 400);
+    //     }
+
+    //     $errors = [];
+
+    //     foreach ($vendors as $index => $vendor) {
+    //         $vendorName = $vendor['vendor_name'] ?? null;
+
+    //         if (!$vendorName) {
+    //             $errors[] = "Vendor name is required at index $index.";
+    //             continue;
+    //         }
+
+    //         // Check for uniqueness
+    //         $existingVendor = VendorTemplates::where('vendor_name', $vendorName)->where('deleted_from_home', 0)->where('is_dropdown_show', 0)->first();
+
+    //         if ($existingVendor) {
+    //             $errors[] = "Vendor name '{$vendorName}' already exists at index $index.";
+    //             continue;
+    //         }
+
+    //         $is_dropdown = VendorTemplates::where('vendor_name', $vendorName)->where('is_dropdown_show',1)->first();
+
+    //         $is_dropdown_show = 0;
+
+    //         if(isset($is_dropdown) && !empty($is_dropdown)){
+    //             $is_dropdown_show = 0;
+    //         }else{
+    //             $is_dropdown_show = 1;
+    //         }
+
+    //         $logoPath = null;
+
+    //         if ($request->hasFile("vendors.$index.logo_url")) {
+    //             $file = $request->file("vendors.$index.logo_url");
+    //             $logoPath = $file->store('vendor_logos', 'public');
+    //         }
+
+    //         $data = [
+    //             'user_id' => $vendor['user_id'] ?? null,
+    //             'vendor_type' => $vendor['vendor_type'] ?? null,
+    //             'vendor_name' => $vendorName,
+    //             'vendor_email' => $vendor['vendor_email'] ?? null,
+    //             'vendor_phone' => $vendor['vendor_phone'] ?? null,
+    //             'logo_url' => $logoPath ? asset('storage/' . $logoPath) : parse_url($vendor['logo_url'], PHP_URL_PATH),
+    //             'login_url' => $vendor['login_url'] ?? null,
+    //             'support_info' => $vendor['support_info'] ?? null,
+    //             'notes' => $vendor['notes'] ?? null,
+    //             'rep_name' => $vendor['rep_name'] ?? null,
+    //             'rep_email' => $vendor['rep_email'] ?? null,
+    //             'rep_phone' => $vendor['rep_phone'] ?? null,
+    //             'description' => $vendor['description'] ?? null,
+    //             'is_dropdown_show' => $is_dropdown_show
+    //         ];
+
+    //         VendorTemplates::create($data);
+    //     }
+
+    //     if (!empty($errors)) {
+    //         return response()->json(['message' => 'Some vendors were not saved.', 'errors' => $errors], 422);
+    //     }
+
+    //     return ApiResponseService::success('Vendors saved successfully', []);
+    // }
+
     public function storeVendorTemplates(Request $request)
     {
         $vendors = json_decode($request->input('vendors'), true);
@@ -32,60 +102,69 @@ class VendorTemplateController extends Controller
                 continue;
             }
 
-            // Check for uniqueness
-            $existingVendor = VendorTemplates::where('vendor_name', $vendorName)->where('deleted_from_home', 0)->first();
+            // Check if name already exists for is_dropdown_show = 0
+            $existsNonDropdown = VendorTemplates::where('vendor_name', $vendorName)
+                ->where('deleted_from_home', 0)
+                ->where('is_dropdown_show', 0)
+                ->exists();
 
-            if ($existingVendor) {
+            if ($existsNonDropdown) {
                 $errors[] = "Vendor name '{$vendorName}' already exists at index $index.";
                 continue;
             }
 
-            $is_dropdown = VendorTemplates::where('vendor_name', $vendorName)->where('is_dropdown_show',1)->first();
+            // Check if already exists for is_dropdown_show = 1
+            $existsDropdown = VendorTemplates::where('vendor_name', $vendorName)
+                ->where('deleted_from_home', 0)
+                ->where('is_dropdown_show', 1)
+                ->exists();
 
-            $is_dropdown_show = 0;
-
-            if(isset($is_dropdown) && !empty($is_dropdown)){
-                $is_dropdown_show = 0;
-            }else{
-                $is_dropdown_show = 1;
-            }
-
+            // Handle logo
             $logoPath = null;
-
             if ($request->hasFile("vendors.$index.logo_url")) {
                 $file = $request->file("vendors.$index.logo_url");
                 $logoPath = $file->store('vendor_logos', 'public');
             }
 
-            $data = [
-                'user_id' => $vendor['user_id'] ?? null,
-                'vendor_type' => $vendor['vendor_type'] ?? null,
-                'vendor_name' => $vendorName,
-                'vendor_email' => $vendor['vendor_email'] ?? null,
-                'vendor_phone' => $vendor['vendor_phone'] ?? null,
-                'logo_url' => $logoPath ? asset('storage/' . $logoPath) : parse_url($vendor['logo_url'], PHP_URL_PATH),
-                'login_url' => $vendor['login_url'] ?? null,
-                'support_info' => $vendor['support_info'] ?? null,
-                'notes' => $vendor['notes'] ?? null,
-                'rep_name' => $vendor['rep_name'] ?? null,
-                'rep_email' => $vendor['rep_email'] ?? null,
-                'rep_phone' => $vendor['rep_phone'] ?? null,
-                'description' => $vendor['description'] ?? null,
-                'is_dropdown_show' => $is_dropdown_show
+            $logoUrl = $logoPath
+                ? asset("storage/{$logoPath}")
+                : parse_url($vendor['logo_url'] ?? '', PHP_URL_PATH);
+
+            // Shared data
+            $baseData = [
+                'user_id'        => $vendor['user_id'] ?? null,
+                'vendor_type'    => $vendor['vendor_type'] ?? null,
+                'vendor_name'    => $vendorName,
+                'vendor_email'   => $vendor['vendor_email'] ?? null,
+                'vendor_phone'   => $vendor['vendor_phone'] ?? null,
+                'logo_url'       => $logoUrl,
+                'login_url'      => $vendor['login_url'] ?? null,
+                'support_info'   => $vendor['support_info'] ?? null,
+                'notes'          => $vendor['notes'] ?? null,
+                'rep_name'       => $vendor['rep_name'] ?? null,
+                'rep_email'      => $vendor['rep_email'] ?? null,
+                'rep_phone'      => $vendor['rep_phone'] ?? null,
+                'description'    => $vendor['description'] ?? null,
             ];
 
-            VendorTemplates::create($data);
+            // Insert non-dropdown record
+            VendorTemplates::create(array_merge($baseData, ['is_dropdown_show' => 0]));
+
+            // Insert dropdown record only if not already present
+            if (!$existsDropdown) {
+                VendorTemplates::create(array_merge($baseData, ['is_dropdown_show' => 1]));
+            }
         }
 
         if (!empty($errors)) {
-            return response()->json(['message' => 'Some vendors were not saved.', 'errors' => $errors], 422);
+            return response()->json([
+                'message' => 'Some vendors were not saved.',
+                'errors'  => $errors,
+            ], 422);
         }
 
         return ApiResponseService::success('Vendors saved successfully', []);
     }
-
-
-
 
     public function showVendorTemplate(Request $request)
     {
@@ -138,6 +217,10 @@ class VendorTemplateController extends Controller
             $q->where('deleted_from_home', 0);
         });
 
+        $query->where(function ($q) {
+            $q->where('is_dropdown_show', 0);
+        });
+
         // if ($request->has('user_id')) {
         //     $query->where('user_id', $request->user_id);
         // }
@@ -181,16 +264,16 @@ class VendorTemplateController extends Controller
 
     public function updateVendor(Request $request)
     {
-        \Log::info($request->all());
-        \Log::info('this is vendor request');
-
         $validator = Validator::make($request->all(), [
             'id' => 'required|exists:vendor_templates,id',
             'vendor_name' => [
                 'required',
                 Rule::unique('vendor_templates', 'vendor_name')
                     ->ignore($request->id)
-                    ->where(fn($q) => $q->where('deleted_from_home', 0)),
+                    ->where(function ($query) {
+                    $query->where('deleted_from_home', 0)
+                            ->where('is_dropdown_show', 0);
+                    }),
             ],
             // 'vendor_email' => 'required|email',
             // 'vendor_phone' => 'required',
